@@ -392,6 +392,7 @@ void Primitive::SetDefaults(bool fromMouseClick)
    m_d.m_fReflectionEnabled = fromMouseClick ? LoadValueBoolWithDefault(strKeyName, "ReflectionEnabled", true) : true;
    m_d.m_fBackfacesEnabled = fromMouseClick ? LoadValueBoolWithDefault(strKeyName, "BackfacesEnabled", false) : false;
    m_d.m_fDisplayTexture = fromMouseClick ? LoadValueBoolWithDefault(strKeyName, "DisplayTexture", false) : false;
+   m_d.m_objectSpaceNormalMap = fromMouseClick ? LoadValueBoolWithDefault(strKeyName, "ObjectSpaceNormalMap", false) : false;
 }
 
 void Primitive::WriteRegDefaults()
@@ -439,6 +440,7 @@ void Primitive::WriteRegDefaults()
    SaveValueBool(strKeyName, "ReflectionEnabled", m_d.m_fReflectionEnabled);
    SaveValueBool(strKeyName, "BackfacesEnabled", m_d.m_fBackfacesEnabled);
    SaveValueBool(strKeyName, "DisplayTexture", m_d.m_fDisplayTexture);
+   SaveValueBool(strKeyName, "ObjectSpaceNormalMap", m_d.m_objectSpaceNormalMap);
 }
 
 void Primitive::GetTimers(vector<HitTimer*> &pvht)
@@ -1225,6 +1227,8 @@ void Primitive::RenderObject()
 			  pd3dDevice->basicShader->SetTexture("Texture0", pin, false);
 			  pd3dDevice->basicShader->SetTexture("Texture4", nMap, true);
 			  pd3dDevice->basicShader->SetAlphaTestValue(pin->m_alphaTestValue * (float)(1.0 / 255.0));
+              pd3dDevice->basicShader->SetBool("objectSpaceNormalMap", m_d.m_objectSpaceNormalMap);
+
 			  //g_pplayer->m_pin3d.SetPrimaryTextureFilter(0, TEXTURE_MODE_TRILINEAR);
 			  // accommodate models with UV coords outside of [0,1]
 			  pd3dDevice->SetTextureAddressMode(0, RenderDevice::TEX_WRAP);
@@ -1417,6 +1421,7 @@ HRESULT Primitive::SaveData(IStream *pstm, HCRYPTHASH hcrypthash, BOOL bBackupFo
    bw.WriteString(FID(MAPH), m_d.m_szPhysicsMaterial);
    bw.WriteBool(FID(OVPH), m_d.m_fOverwritePhysics);
    bw.WriteBool(FID(DIPT), m_d.m_fDisplayTexture);
+   bw.WriteBool(FID(OSNM), m_d.m_objectSpaceNormalMap);
 
    // No need to backup the meshes for play as the script cannot change them 
    if (m_d.m_use3DMesh && !bBackupForPlay)
@@ -1692,6 +1697,10 @@ BOOL Primitive::LoadToken(int id, BiffReader *pbr)
    else if (id == FID(DIPT))
    {
       pbr->GetBool(&m_d.m_fDisplayTexture);
+   }
+   else if (id == FID(OSNM))
+   {
+      pbr->GetBool(&m_d.m_objectSpaceNormalMap);
    }
    else if (id == FID(M3DN))
    {
@@ -3004,6 +3013,21 @@ STDMETHODIMP Primitive::put_BackfacesEnabled(VARIANT_BOOL newVal)
    STOPUNDO
 
       return S_OK;
+}
+
+STDMETHODIMP Primitive::get_ObjectSpaceNormalMap(VARIANT_BOOL *pVal)
+{
+   *pVal = FTOVB(m_d.m_objectSpaceNormalMap);
+   return S_OK;
+}
+
+STDMETHODIMP Primitive::put_ObjectSpaceNormalMap(VARIANT_BOOL newVal)
+{
+   STARTUNDO
+   m_d.m_objectSpaceNormalMap = VBTOb(newVal);
+   STOPUNDO
+
+   return S_OK;
 }
 
 STDMETHODIMP Primitive::get_DisableLighting(VARIANT_BOOL *pVal)

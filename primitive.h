@@ -97,6 +97,8 @@ public:
    bool m_fOverwritePhysics;
    bool m_fBackfacesEnabled;
    bool m_fDisplayTexture;     // in editor
+    // in editor
+   bool m_objectSpaceNormalMap; // matches the +X,+Y,+Z object space export/baking of Blender
 };
 
 class Primitive :
@@ -235,6 +237,8 @@ public:
    STDMETHOD(ContinueAnim)(float speed);
    STDMETHOD(ShowFrame)(float frame);
    STDMETHOD(get_HitThreshold)(/*[out, retval]*/ float *pVal);
+   STDMETHOD(get_ObjectSpaceNormalMap)(/*[out, retval]*/ VARIANT_BOOL *pVal);
+   STDMETHOD(put_ObjectSpaceNormalMap)(/*[in]*/ VARIANT_BOOL newVal);
 
    Primitive();
    virtual ~Primitive();
