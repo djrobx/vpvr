@@ -1230,7 +1230,7 @@ void Flasher::RenderDynamic()
    TRACE_FUNCTION();
 
    // Don't render if invisible (or DMD connection not set)
-   if (!m_d.m_IsVisible || dynamicVertexBuffer == NULL || m_ptable->m_fReflectionEnabled || (m_d.m_IsDMD && (!g_pplayer->m_texdmd || !captureExternalDMD())))
+   if (!m_d.m_IsVisible || dynamicVertexBuffer == NULL || m_ptable->m_fReflectionEnabled || (m_d.m_IsDMD && !g_pplayer->m_texdmd && !captureExternalDMD()))
       return;
 
    const vec4 color = convertColor(m_d.m_color, (float)m_d.m_alpha*m_d.m_intensity_scale / 100.0f);
