@@ -2,7 +2,7 @@
 #include "captureExt.h"
 
 HBITMAP m_BitMap_DMD;
-bool dmdCaptureRunning = false;
+bool g_dmdCaptureRunning = false;
 bool dmdBitMapProcessing = false;
 bool dmdSuccess = false;
 
@@ -21,6 +21,8 @@ bool captureExternalDMD()
       HWND target = FindWindowA(NULL, "Virtual DMD"); // Freezys and UltraDMD
       if (target == NULL)
          target = FindWindowA("pygame", NULL); // P-ROC DMD (CCC Reloaded)
+      if (target == NULL)
+         target = FindWindowA("PUPSCREEN1", NULL); // PupDMD
 
       if (target != NULL)
       {
@@ -30,7 +32,7 @@ bool captureExternalDMD()
          int w = rt.right - rt.left;
          int h = rt.bottom - rt.top;
 
-         if (!dmdCaptureRunning)
+         if (!g_dmdCaptureRunning)
          {
             threadPool.enqueue(std::bind(captureDMDWindow, w, h, rt.left, rt.top));
          }
@@ -45,7 +47,7 @@ bool captureExternalDMD()
 
 void captureDMDWindow(int w, int h, int offsetLeft, int offsetTop)
 {
-   dmdCaptureRunning = true;
+   g_dmdCaptureRunning = true;
 
    HDC dcTarget = GetDC(HWND_DESKTOP); // Freezy is WPF so need to capture the window through desktop
    HDC dcTemp = CreateCompatibleDC(NULL);
@@ -61,7 +63,7 @@ void captureDMDWindow(int w, int h, int offsetLeft, int offsetTop)
    DeleteDC(dcTemp);
    ReleaseDC(HWND_DESKTOP, dcTarget);
 
-   dmdCaptureRunning = false;
+   g_dmdCaptureRunning = false;
 }
 
 void processdmdBitMap(int w, int h)
@@ -91,7 +93,7 @@ bool capturePUP()
 {
    if (g_pplayer->m_capPUP)
    {
-      HWND target = FindWindowA(NULL, "PUPOVERLAY2"); // PUP Window
+      HWND target = FindWindowA(NULL, "PUPSCREEN2"); // PUP Window
 
       if (target != NULL)
       {

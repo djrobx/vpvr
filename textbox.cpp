@@ -209,14 +209,15 @@ void Textbox::EndPlay()
    IEditable::EndPlay();
 }
 
+extern bool g_dmdCaptureRunning;
+
 void Textbox::RenderDynamic()
 {
    TRACE_FUNCTION();
 
    const bool dmd = (m_d.m_IsDMD || strstr(m_d.sztext, "DMD") != NULL); //!! second part is VP10.0 legacy
 
-   if (!m_d.m_fVisible || (dmd && !g_pplayer->m_texdmd))
-      if (!g_pplayer->m_capExtDMD || (FindWindowA(NULL, "Virtual DMD") == NULL && FindWindowA("pygame", NULL) == NULL)) // If DMD capture is enabled check for external DMD window
+   if (!m_d.m_fVisible || (dmd && !(g_pplayer->m_texdmd || (g_pplayer->m_capExtDMD && g_dmdCaptureRunning))))
          return;
 
    RenderDevice * const pd3dDevice = m_fBackglass ? g_pplayer->m_pin3d.m_pd3dSecondaryDevice : g_pplayer->m_pin3d.m_pd3dPrimaryDevice;
