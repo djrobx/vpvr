@@ -2,11 +2,15 @@
 #include "captureExt.h"
 
 HBITMAP m_BitMap_DMD;
-bool g_dmdCaptureRunning = false;
+RECT dmdRect;
+bool dmdFoundRect = false;
+bool dmdCaptureRunning = false;
 bool dmdBitMapProcessing = false;
 bool dmdSuccess = false;
 
 HBITMAP m_BitMap_PUP;
+RECT pupRect;
+bool pupFoundRect = false;
 bool PUPCaptureRunning = false;
 bool PUPBitMapProcessing = false;
 bool PUPSuccess = false;
@@ -18,28 +22,30 @@ bool captureExternalDMD()
 {
    if (g_pplayer->m_capExtDMD)
    {
-      HWND target = FindWindowA(NULL, "Virtual DMD"); // Freezys and UltraDMD
-      if (target == NULL)
-         target = FindWindowA("pygame", NULL); // P-ROC DMD (CCC Reloaded)
-      if (target == NULL)
-         target = FindWindowA("PUPSCREEN1", NULL); // PupDMD
-
-      if (target != NULL)
+      if (!dmdFoundRect)
       {
-         // Get target window width and height
-         RECT rt;
-         GetWindowRect(target, &rt);
-         int w = rt.right - rt.left;
-         int h = rt.bottom - rt.top;
+         HWND target = FindWindowA(NULL, "Virtual DMD"); // Freezys and UltraDMD
+         if (target == NULL)
+            target = FindWindowA("pygame", NULL); // P-ROC DMD (CCC Reloaded)
+         if (target == NULL)
+            target = FindWindowA(NULL, "PUPSCREEN1"); // PupDMD
+         if (target == NULL)
+            return false;
+         GetWindowRect(target, &dmdRect);
+   
+         dmdFoundRect = true;
+      }
+      // Get target window width and height
+      int w = dmdRect.right - dmdRect.left;
+      int h = dmdRect.bottom - dmdRect.top;
 
-         if (!g_dmdCaptureRunning)
-         {
-            threadPool.enqueue(std::bind(captureDMDWindow, w, h, rt.left, rt.top));
-         }
-         if (!dmdBitMapProcessing && m_BitMap_DMD != NULL)
-         {
-            threadPool.enqueue(std::bind(processdmdBitMap, w, h));
-         }
+      if (!dmdCaptureRunning)
+      {
+         threadPool.enqueue(std::bind(captureDMDWindow, w, h, dmdRect.left, dmdRect.top));
+      }
+      if (!dmdBitMapProcessing && m_BitMap_DMD != NULL)
+      {
+         threadPool.enqueue(std::bind(processdmdBitMap, w, h));
       }
    }
    return dmdSuccess;
@@ -47,7 +53,7 @@ bool captureExternalDMD()
 
 void captureDMDWindow(int w, int h, int offsetLeft, int offsetTop)
 {
-   g_dmdCaptureRunning = true;
+   dmdCaptureRunning = true;
 
    HDC dcTarget = GetDC(HWND_DESKTOP); // Freezy is WPF so need to capture the window through desktop
    HDC dcTemp = CreateCompatibleDC(NULL);
@@ -63,7 +69,7 @@ void captureDMDWindow(int w, int h, int offsetLeft, int offsetTop)
    DeleteDC(dcTemp);
    ReleaseDC(HWND_DESKTOP, dcTarget);
 
-   g_dmdCaptureRunning = false;
+   dmdCaptureRunning = false;
 }
 
 void processdmdBitMap(int w, int h)
@@ -93,25 +99,28 @@ bool capturePUP()
 {
    if (g_pplayer->m_capPUP)
    {
-      HWND target = FindWindowA(NULL, "PUPSCREEN2"); // PUP Window
-
-      if (target != NULL)
+      if (!pupFoundRect)
       {
+         HWND target = FindWindowA(NULL, "PUPSCREEN2"); // PUP Window
+
+         if (target == NULL)
+            return false;
+
          // Get target window width and height
-         RECT rt;
-         GetWindowRect(target, &rt);
-         int w = rt.right - rt.left;
-         int h = rt.bottom - rt.top;
+         GetWindowRect(target, &pupRect);
+         pupFoundRect = true;
+      }
+      int w = pupRect.right - pupRect.left;
+      int h = pupRect.bottom - pupRect.top;
 
-         if (!PUPCaptureRunning)
-         {
-            threadPool.enqueue(std::bind(capturePUPWindow, w, h, rt.left, rt.top));
-         }
+      if (!PUPCaptureRunning)
+      {
+         threadPool.enqueue(std::bind(capturePUPWindow, w, h, pupRect.left, pupRect.top));
+      }
 
-         if (!PUPBitMapProcessing && m_BitMap_PUP != NULL)
-         {
-            threadPool.enqueue(std::bind(processPUPBitMap, w, h));
-         }
+      if (!PUPBitMapProcessing && m_BitMap_PUP != NULL)
+      {
+         threadPool.enqueue(std::bind(processPUPBitMap, w, h));
       }
    }
    return PUPSuccess;

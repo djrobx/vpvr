@@ -250,7 +250,7 @@ extern bool g_dmdCaptureRunning;
 
 void BackGlass::DMDdraw(const float DMDposx, const float DMDposy, const float DMDwidth, const float DMDheight, const COLORREF DMDcolor, const float intensity)
 {
-   if (g_pplayer->m_texdmd || (g_pplayer->m_capExtDMD && g_dmdCaptureRunning)) // If DMD capture is enabled check if external DMD exists (for capturing UltraDMD+P-ROC DMD)
+   if (g_pplayer->m_texdmd || captureExternalDMD()) // If DMD capture is enabled check if external DMD exists (for capturing UltraDMD+P-ROC DMD)
    {
       //const float width = g_pplayer->m_pin3d.m_useAA ? 2.0f*(float)m_width : (float)m_width;
       m_pd3dDevice->DMDShader->SetTechnique("basic_DMD"); //!! DMD_UPSCALE ?? -> should just work
