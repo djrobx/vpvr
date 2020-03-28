@@ -4,6 +4,7 @@
 #include "../meshes/ballMesh.h"
 #include "Shader.h"
 #include "typeDefs3D.h"
+#include "captureExt.h"
 
 // touch defines, delete as soon as we can get rid of old compilers and use new ones that have these natively
 //#define TEST_TOUCH_WITH_MOUSE
@@ -690,6 +691,8 @@ Player::~Player()
 
 void Player::Shutdown()
 {
+   captureStop();
+
    // if limit framerate if requested by user (vsync Hz higher than refreshrate of gfxcard/monitor), restore timeEndPeriod
    const int localvsync = (m_ptable->m_TableAdaptiveVSync == -1) ? m_VSync : m_ptable->m_TableAdaptiveVSync;
    if (localvsync > m_refreshrate)
