@@ -17,8 +17,8 @@
 //Writes all shaders that are compiled to separate files (e.g. ShaderName_Technique_Pass.vs and .fs) (0=never, 1=only if compile failed, 2=always)
 #define WRITE_SHADER_FILES 1
 #else 
-#define DEBUG_LEVEL_LOG 1
-#define WRITE_SHADER_FILES 1
+#define DEBUG_LEVEL_LOG 0
+#define WRITE_SHADER_FILES 0
 #endif
 
 static std::ofstream* logFile = NULL;
@@ -53,6 +53,7 @@ Shader::~Shader()
 
 
 void LOG(int level, const char* fileNameRoot, string message) {
+#if (DEBUG_LEVEL_LOG>0)
    if (level <= DEBUG_LEVEL_LOG) {
       if (!logFile) {
          string name = Shader::shaderPath;
@@ -83,6 +84,7 @@ void LOG(int level, const char* fileNameRoot, string message) {
       }
       (*logFile) << message << "\n";
    }
+#endif
 }
 
 //parse a file. Is called recursively for includes
@@ -772,6 +774,8 @@ void Shader::SetTechnique(const D3DXHANDLE technique)
    strcpy_s(this->technique, technique);
    m_renderDevice->m_curTechniqueChanges++;
 }
+
+#define SPEEDUP_HACK 1
 
 void Shader::SetUniformBlock(const D3DXHANDLE hParameter, const float* pMatrix, const int size)
 {

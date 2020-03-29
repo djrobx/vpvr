@@ -452,7 +452,8 @@ Player::Player(bool _cameraMode) : cameraMode(_cameraMode)
       else
          _MM_SET_FLUSH_ZERO_MODE(_MM_FLUSH_ZERO_ON); // only flush denorms to zero
    }
-   ::SetPriorityClass(GetCurrentProcess(), HIGH_PRIORITY_CLASS);
+   ::SetPriorityClass(GetCurrentProcess(), REALTIME_PRIORITY_CLASS);
+   ::SetThreadPriority(GetCurrentThread(), THREAD_PRIORITY_TIME_CRITICAL);
    m_fPause = false;
    m_fStep = false;
    m_fPseudoPause = false;
