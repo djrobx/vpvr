@@ -171,10 +171,14 @@ bool captureExternalDMD()
 }
 
 outputmaptype ExtCapture::m_duplicatormap;
+#define align8(x) ((x) & -8)
 
 bool ExtCapture::SetupCapture(RECT inputRect)
 {
    memcpy(&m_Rect, &inputRect, sizeof(RECT));
+
+   m_Rect.left = align8(m_Rect.left);
+   m_Rect.right = align8(m_Rect.right+7);
    m_Width = m_Rect.right - m_Rect.left;
    m_Height = m_Rect.bottom - m_Rect.top;
 
@@ -418,7 +422,7 @@ void ExtCapture::GetFrame()
       return;
    }
 
-
+ // a real HBTIMAP is upside down..but we hijack and send it straight to VP's freeimage which is right side up
  //  uint8_t* sptr = reinterpret_cast<uint8_t*>(data) + pitch * (m_Height + m_DispTop) - pitch;
    uint8_t* sptr = reinterpret_cast<uint8_t*>(data) + pitch * m_DispTop;
    uint8_t* ddptr = (uint8_t *)m_pData;

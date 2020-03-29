@@ -134,12 +134,14 @@
     <TargetName>VPinballX</TargetName>
     <TargetExt>.exe</TargetExt>
     <LinkIncremental>false</LinkIncremental>
+    <IncludePath>$(IncludePath);$(DXSDK_DIR)Include</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug_SDL|Win32'">
     <ExecutablePath>$(DXSDK_DIR)Utilities\Bin\x86;$(ExecutablePath)</ExecutablePath>
     <TargetName>VPinballX_GL</TargetName>
     <TargetExt>.exe</TargetExt>
     <LinkIncremental>false</LinkIncremental>
+    <IncludePath>$(IncludePath);$(DXSDK_DIR)Include</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ExecutablePath>$(DXSDK_DIR)Utilities\Bin\x64;$(ExecutablePath)</ExecutablePath>
@@ -163,6 +165,7 @@
     <GenerateManifest>true</GenerateManifest>
     <EmbedManifest>true</EmbedManifest>
     <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
+    <IncludePath>$(IncludePath);$(DXSDK_DIR)Include</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release_SDL|Win32'">
     <ExecutablePath>$(ExecutablePath)</ExecutablePath>
@@ -172,7 +175,7 @@
     <GenerateManifest>true</GenerateManifest>
     <EmbedManifest>true</EmbedManifest>
     <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
-    <IncludePath>$(DXSDK_DIR)Include;$(VC_IncludePath);$(WindowsSDK_IncludePath)</IncludePath>
+    <IncludePath>$(IncludePath);$(DXSDK_DIR)Include</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ExecutablePath>$(DXSDK_DIR)Utilities\Bin\x64;$(ExecutablePath)</ExecutablePath>

@@ -1,13 +1,6 @@
 #pragma once
 #include "typeDefs3D.h"
-#include <windows.h>
-#include <d3d11.h>
 
-// WTFBBQ!?
-typedef D3DCOLORVALUE DXGI_RGBA;
-
-#include <DXGIType.h>
-#include <dxgi1_2.h>
 #include <sal.h>
 #include <new>
 #include <warning.h>
