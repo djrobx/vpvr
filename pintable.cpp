@@ -8577,13 +8577,12 @@ HRESULT PinTable::LoadImageFromStream(IStream *pstm, int version)
 
       if (ppi->LoadFromStream(pstm, version, this) == S_OK)
       {
+		  const std::lock_guard<std::mutex> lock(g_table_mutex);
          m_vimage.push_back(ppi);
       }
       else
-      {
          delete ppi;
       }
-   }
 
    return S_OK;
 }
