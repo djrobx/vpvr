@@ -99,6 +99,8 @@ void captureFindDMD()
 
 void captureThread()
 {
+   SetThreadPriority(GetCurrentThread(), THREAD_PRIORITY_LOWEST);
+
    while (!StopCapture)
    {
       if (ecDMDStage == ecSearching)
@@ -116,7 +118,7 @@ void captureThread()
          ecPUP.GetFrame();
          g_pplayer->m_pin3d.m_pd3dPrimaryDevice->m_texMan.SetDirty(g_pplayer->m_texPUP);
       }
-      Sleep(10);
+      Sleep(5);
    }
 }
 
