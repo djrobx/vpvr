@@ -636,7 +636,7 @@ void RenderDevice::InitVR() {
    matEye2Head.Invert();
 
    float nearPlane = LoadValueFloatWithDefault("PlayerVR", "nearPlane", 5.0f) / 100.0f;
-   float farPlane = LoadValueFloatWithDefault("PlayerVR", "farPlane", 500.0f) / 100.0f;
+   float farPlane = LoadValueFloatWithDefault("PlayerVR", "farPlane", 5000.0f) / 100.0f;
 
    mat44 = m_pHMD->GetProjectionMatrix(vr::Eye_Left, nearPlane, farPlane);//5cm to 5m should be a reasonable range
    for (int i = 0;i < 4;i++)
