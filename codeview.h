@@ -357,7 +357,7 @@ public:
    virtual ISelect *GetISelect();
 
    //ILoadable
-   virtual HRESULT SaveData(IStream *pstm, HCRYPTHASH hcrypthash);
+   virtual HRESULT SaveData(IStream *pstm, HCRYPTHASH hcrypthash, BOOL bBackupForPlay);
    virtual HRESULT LoadData(IStream *pstm, PinTable *ppt, int version, HCRYPTHASH hcrypthash, HCRYPTKEY hcryptkey);
    virtual BOOL LoadToken(int id, BiffReader *pbr);
 

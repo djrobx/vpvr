@@ -864,7 +864,7 @@ STDMETHODIMP Plunger::InterfaceSupportsErrorInfo(REFIID riid)
    return S_FALSE;
 }
 
-HRESULT Plunger::SaveData(IStream *pstm, HCRYPTHASH hcrypthash)
+HRESULT Plunger::SaveData(IStream *pstm, HCRYPTHASH hcrypthash, BOOL bBackupForPlay)
 {
    BiffWriter bw(pstm, hcrypthash);
 

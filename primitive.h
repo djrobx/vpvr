@@ -265,7 +265,7 @@ public:
    // Multi-object manipulation
    virtual Vertex2D GetCenter() const;
    virtual void PutCenter(const Vertex2D& pv);
-
+ 
    //STDMETHOD(get_Name)(BSTR *pVal) {return E_FAIL;}
 
    //virtual HRESULT InitVBA(BOOL fNew, int id, WCHAR *wzName);
@@ -326,6 +326,7 @@ private:        // private member functions
    void AddHitEdge(vector<HitObject*> &pvho, std::set< std::pair<unsigned, unsigned> >& addedEdges, const unsigned i, const unsigned j, const Vertex3Ds &vi, const Vertex3Ds &vj);
 
    void CalculateBuiltinOriginal();
+   void WaitForMeshDecompression();
 
    PropertyPane *m_propVisual;
    PropertyPane *m_propPosition;

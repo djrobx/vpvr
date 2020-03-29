@@ -8,6 +8,7 @@
 #include "inc\miniz.c"
 #include "inc\progmesh.h"
 #include "Shader.h"
+#include "ThreadPool.h"
 
 // defined in objloader.cpp
 extern bool WaveFrontObj_Load(const char *filename, const bool flipTv, const bool convertToLeftHanded);
@@ -16,6 +17,7 @@ extern void WaveFrontObj_GetIndices(std::vector<unsigned int>& list);
 extern void WaveFrontObj_Save(const char *filename, const char *description, const Mesh& mesh);
 //
 
+ThreadPool *g_pPrimitiveDecompressThreadPool = NULL;
 
 void Mesh::Clear()
 {
@@ -129,9 +131,9 @@ void Mesh::UploadToVB(VertexBuffer * vb, const float frame)
    const int iFrame = (int)intPart;
 
    if (frame != -1.f)
-   {
-      for (size_t i = 0; i < m_vertices.size(); i++)
       {
+          for (size_t i = 0; i < m_vertices.size(); i++)
+   {
          const VertData &v = m_animationFrames[iFrame].m_frameVerts[i];
          m_vertices[i].x = v.x;
          m_vertices[i].y = v.y;
@@ -193,7 +195,8 @@ Primitive::Primitive()
 
 Primitive::~Primitive()
 {
-   if (vertexBuffer)
+   WaitForMeshDecompression();
+    if (vertexBuffer)
       vertexBuffer->release();
    if (indexBuffer)
       indexBuffer->release();
@@ -1354,7 +1357,8 @@ void Primitive::PutCenter(const Vertex2D& pv)
 // Save and Load
 //////////////////////////////
 
-HRESULT Primitive::SaveData(IStream *pstm, HCRYPTHASH hcrypthash)
+
+HRESULT Primitive::SaveData(IStream *pstm, HCRYPTHASH hcrypthash, BOOL bBackupForPlay)
 {
    BiffWriter bw(pstm, hcrypthash);
 
@@ -1403,7 +1407,8 @@ HRESULT Primitive::SaveData(IStream *pstm, HCRYPTHASH hcrypthash)
    bw.WriteBool(FID(OVPH), m_d.m_fOverwritePhysics);
    bw.WriteBool(FID(DIPT), m_d.m_fDisplayTexture);
 
-   if (m_d.m_use3DMesh)
+   // No need to backup the meshes for play as the script cannot change them 
+   if (m_d.m_use3DMesh && !bBackupForPlay)
    {
       bw.WriteString(FID(M3DN), m_d.m_meshFileName);
       bw.WriteInt(FID(M3VN), (int)m_mesh.NumVertices());
@@ -1822,8 +1827,19 @@ BOOL Primitive::LoadToken(int id, BiffReader *pbr)
    return fTrue;
 }
 
+void Primitive::WaitForMeshDecompression()
+{
+   if (g_pPrimitiveDecompressThreadPool)
+   {
+      // This will wait for the threads to finish decompressing meshes.
+      delete g_pPrimitiveDecompressThreadPool;
+      g_pPrimitiveDecompressThreadPool = NULL;
+   }
+}
+
 HRESULT Primitive::InitPostLoad()
 {
+   WaitForMeshDecompression();
    if (!m_d.m_use3DMesh)
       CalculateBuiltinOriginal();
 
@@ -1947,6 +1963,12 @@ INT_PTR CALLBACK Primitive::ObjImportProc(HWND hwndDlg, UINT uMsg, WPARAM wParam
                   }
                }
                prim->m_d.m_use3DMesh = true;
+			   unsigned int* tmp = reorderForsyth(prim->m_mesh.m_indices.data(), (int)(prim->m_mesh.NumIndices() / 3), (int)prim->m_mesh.NumVertices());
+			   if (tmp != NULL)
+			   {
+				   memcpy(prim->m_mesh.m_indices.data(), tmp, prim->m_mesh.NumIndices() * sizeof(unsigned int));
+				   delete[] tmp;
+			   }
                prim->UpdateEditorView();
                prim = NULL;
                EndDialog(hwndDlg, TRUE);

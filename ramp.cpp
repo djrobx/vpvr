@@ -1270,7 +1270,7 @@ void Ramp::ClearForOverwrite()
    ClearPointsForOverwrite();
 }
 
-HRESULT Ramp::SaveData(IStream *pstm, HCRYPTHASH hcrypthash)
+HRESULT Ramp::SaveData(IStream *pstm, HCRYPTHASH hcrypthash, BOOL bBackupForPlay)
 {
    BiffWriter bw(pstm, hcrypthash);
 

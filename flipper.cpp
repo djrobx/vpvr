@@ -891,7 +891,7 @@ void Flipper::RenderStatic()
 {
 }
 
-HRESULT Flipper::SaveData(IStream *pstm, HCRYPTHASH hcrypthash)
+HRESULT Flipper::SaveData(IStream *pstm, HCRYPTHASH hcrypthash, BOOL bBackupForPlay)
 {
    BiffWriter bw(pstm, hcrypthash);
 

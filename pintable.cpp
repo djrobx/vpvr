@@ -9,6 +9,8 @@
 #include <rapidxml_print.hpp>
 #include <fstream>
 #include <sstream>
+#include "freeimage.h"
+#include "threadpool.h"
 #include "Shader.h"
 #include "captureExt.h"
 
@@ -2720,7 +2722,7 @@ HRESULT PinTable::SaveToStorage(IStorage *pstgRoot)
             pstgInfo->Release();
          }
 
-         if (SUCCEEDED(hr = SaveData(pstmGame, hch)))
+         if (SUCCEEDED(hr = SaveData(pstmGame, hch, false)))
          {
             for (size_t i = 0; i < m_vedit.size(); i++)
             {
@@ -2737,7 +2739,7 @@ HRESULT PinTable::SaveToStorage(IStorage *pstgRoot)
                   IEditable *const piedit = m_vedit[i];
                   const ItemTypeEnum type = piedit->GetItemType();
                   pstmItem->Write(&type, sizeof(int), &writ);
-                  hr = piedit->SaveData(pstmItem, NULL);
+                  hr = piedit->SaveData(pstmItem, NULL, false);
                   pstmItem->Release();
                   pstmItem = NULL;
                   //if (FAILED(hr)) goto Error;
@@ -2818,7 +2820,7 @@ HRESULT PinTable::SaveToStorage(IStorage *pstgRoot)
 
                if (SUCCEEDED(hr = pstgData->CreateStream(wszStmName, STGM_DIRECT | STGM_READWRITE | STGM_SHARE_EXCLUSIVE | STGM_CREATE, 0, 0, &pstmItem)))
                {
-                  m_vcollection.ElementAt(i)->SaveData(pstmItem, hch);
+                  m_vcollection.ElementAt(i)->SaveData(pstmItem, hch, false);
                   pstmItem->Release();
                   pstmItem = NULL;
                }
@@ -3239,7 +3241,7 @@ HRESULT PinTable::LoadCustomInfo(IStorage* pstg, IStream *pstmTags, HCRYPTHASH h
    return S_OK;
 }
 
-HRESULT PinTable::SaveData(IStream* pstm, HCRYPTHASH hcrypthash)
+HRESULT PinTable::SaveData(IStream* pstm, HCRYPTHASH hcrypthash, BOOL bBackupForPlay)
 {
    BiffWriter bw(pstm, hcrypthash);
 
@@ -3446,7 +3448,7 @@ HRESULT PinTable::LoadGameFromFilename(char *szFileName)
    {
       MAKE_WIDEPTR_FROMANSI(wszCodeFile, szFileName);
       HRESULT hr;
-      if (FAILED(hr = StgOpenStorage(wszCodeFile, NULL, STGM_TRANSACTED | STGM_READ | STGM_SHARE_EXCLUSIVE, NULL, 0, &pstgRoot)))
+      if (FAILED(hr = StgOpenStorage(wszCodeFile, NULL, STGM_TRANSACTED | STGM_READ, NULL, 0, &pstgRoot)))
       {
          // TEXT
          char msg[MAXSTRING + 16];
@@ -3461,12 +3463,6 @@ HRESULT PinTable::LoadGameFromFilename(char *szFileName)
 
 HRESULT PinTable::LoadGameFromStorage(IStorage *pstgRoot)
 {
-   IStorage *pstgData, *pstgInfo;
-   IStream *pstmGame, *pstmItem, *pstmVersion;
-
-   int ctotalitems;
-   int cloadeditems;
-
    RECT rc;
    ::SendMessage(g_pvp->m_hwndStatusBar, SB_GETRECT, 2, (size_t)&rc);
 
@@ -3520,11 +3516,14 @@ HRESULT PinTable::LoadGameFromStorage(IStorage *pstgRoot)
    int loadfileversion = CURRENT_FILE_FORMAT_VERSION;
 
    //load our stuff first
+   IStorage* pstgData;
    HRESULT hr;
    if (SUCCEEDED(hr = pstgRoot->OpenStorage(L"GameStg", NULL, STGM_DIRECT | STGM_READ | STGM_SHARE_EXCLUSIVE, NULL, 0, &pstgData)))
    {
+      IStream *pstmGame;
       if (SUCCEEDED(hr = pstgData->OpenStream(L"GameData", NULL, STGM_DIRECT | STGM_READ | STGM_SHARE_EXCLUSIVE, 0, &pstmGame)))
       {
+         IStream* pstmVersion;
          if (SUCCEEDED(hr = pstgData->OpenStream(L"Version", NULL, STGM_DIRECT | STGM_READ | STGM_SHARE_EXCLUSIVE, 0, &pstmVersion)))
          {
             ULONG read;
@@ -3550,9 +3549,11 @@ HRESULT PinTable::LoadGameFromStorage(IStorage *pstgRoot)
             CryptDeriveKey(hcp, CALG_RC2, hchkey, (loadfileversion == 600) ? CRYPT_EXPORTABLE : (CRYPT_EXPORTABLE | 0x00280000), &hkey);
          }
 
+         IStorage* pstgInfo;
          if (SUCCEEDED(hr = pstgRoot->OpenStorage(L"TableInfo", NULL, STGM_DIRECT | STGM_READ | STGM_SHARE_EXCLUSIVE, NULL, 0, &pstgInfo)))
          {
             LoadInfo(pstgInfo, hch, loadfileversion);
+            IStream* pstmItem;
             if (SUCCEEDED(hr = pstgData->OpenStream(L"CustomInfoTags", NULL, STGM_DIRECT | STGM_READ | STGM_SHARE_EXCLUSIVE, 0, &pstmItem)))
             {
                hr = LoadCustomInfo(pstgInfo, pstmItem, hch, loadfileversion);
@@ -3570,8 +3571,8 @@ HRESULT PinTable::LoadGameFromStorage(IStorage *pstgRoot)
 
          if (SUCCEEDED(hr = LoadData(pstmGame, csubobj, csounds, ctextures, cfonts, ccollection, loadfileversion, hch, (loadfileversion < NO_ENCRYPTION_FORMAT_VERSION) ? hkey : NULL)))
          {
-            ctotalitems = csubobj + csounds + ctextures + cfonts;
-            cloadeditems = 0;
+            const int ctotalitems = csubobj + csounds + ctextures + cfonts;
+            int cloadeditems = 0;
             ::SendMessage(hwndProgressBar, PBM_SETRANGE, 0, MAKELPARAM(0, ctotalitems));
 
             for (int i = 0; i < csubobj; i++)
@@ -3583,6 +3584,7 @@ HRESULT PinTable::LoadGameFromStorage(IStorage *pstgRoot)
 
                MAKE_WIDEPTR_FROMANSI(wszStmName, szStmName);
 
+               IStream* pstmItem;
                if (SUCCEEDED(hr = pstgData->OpenStream(wszStmName, NULL, STGM_DIRECT | STGM_READ | STGM_SHARE_EXCLUSIVE, 0, &pstmItem)))
                {
                   ULONG read;
@@ -3616,6 +3618,7 @@ HRESULT PinTable::LoadGameFromStorage(IStorage *pstgRoot)
 
                MAKE_WIDEPTR_FROMANSI(wszStmName, szStmName);
 
+               IStream* pstmItem;
                if (SUCCEEDED(hr = pstgData->OpenStream(wszStmName, NULL, STGM_DIRECT | STGM_READ | STGM_SHARE_EXCLUSIVE, 0, &pstmItem)))
                {
                   LoadSoundFromStream(pstmItem, loadfileversion);
@@ -3625,9 +3628,13 @@ HRESULT PinTable::LoadGameFromStorage(IStorage *pstgRoot)
                cloadeditems++;
                ::SendMessage(hwndProgressBar, PBM_SETPOS, cloadeditems, 0);
             }
+            {
+               ThreadPool pool(8);
 
             for (int i = 0; i < ctextures; i++)
             {
+                  pool.enqueue([i, loadfileversion, pstgData, this] {
+                     HRESULT hr;
                char szSuffix[32], szStmName[64];
                strcpy_s(szStmName, sizeof(szStmName), "Image");
                _itoa_s(i, szSuffix, sizeof(szSuffix), 10);
@@ -3635,15 +3642,20 @@ HRESULT PinTable::LoadGameFromStorage(IStorage *pstgRoot)
 
                MAKE_WIDEPTR_FROMANSI(wszStmName, szStmName);
 
+                     IStream* pstmItem;
                if (SUCCEEDED(hr = pstgData->OpenStream(wszStmName, NULL, STGM_DIRECT | STGM_READ | STGM_SHARE_EXCLUSIVE, 0, &pstmItem)))
                {
-                  LoadImageFromStream(pstmItem, loadfileversion);
+                        hr = LoadImageFromStream(pstmItem, loadfileversion);
+                        if (FAILED(hr))
+                           return;
                   pstmItem->Release();
                   pstmItem = NULL;
                }
+                  });
                cloadeditems++;
-               ::SendMessage(hwndProgressBar, PBM_SETPOS, cloadeditems, 0);
+               }
             }
+               ::SendMessage(hwndProgressBar, PBM_SETPOS, cloadeditems, 0);
 
             for (int i = 0; i < cfonts; i++)
             {
@@ -3654,9 +3666,10 @@ HRESULT PinTable::LoadGameFromStorage(IStorage *pstgRoot)
 
                MAKE_WIDEPTR_FROMANSI(wszStmName, szStmName);
 
+               IStream* pstmItem;
                if (SUCCEEDED(hr = pstgData->OpenStream(wszStmName, NULL, STGM_DIRECT | STGM_READ | STGM_SHARE_EXCLUSIVE, 0, &pstmItem)))
                {
-                  PinFont *ppf = new PinFont();
+                  PinFont * const ppf = new PinFont();
                   ppf->LoadFromStream(pstmItem, loadfileversion);
                   m_vfont.push_back(ppf);
                   ppf->Register();
@@ -3676,6 +3689,7 @@ HRESULT PinTable::LoadGameFromStorage(IStorage *pstgRoot)
 
                MAKE_WIDEPTR_FROMANSI(wszStmName, szStmName);
 
+               IStream* pstmItem;
                if (SUCCEEDED(hr = pstgData->OpenStream(wszStmName, NULL, STGM_DIRECT | STGM_READ | STGM_SHARE_EXCLUSIVE, 0, &pstmItem)))
                {
                   CComObject<Collection> *pcol;
@@ -3703,6 +3717,7 @@ HRESULT PinTable::LoadGameFromStorage(IStorage *pstgRoot)
 
          if (loadfileversion > 40)
          {
+            IStream* pstmVersion;
             if (SUCCEEDED(hr = pstgData->OpenStream(L"MAC", NULL, STGM_DIRECT | STGM_READ | STGM_SHARE_EXCLUSIVE, 0, &pstmVersion)))
             {
                BYTE hashvalOld[256];
@@ -3722,6 +3737,7 @@ HRESULT PinTable::LoadGameFromStorage(IStorage *pstgRoot)
                foo = CryptDestroyKey(hkey);
 
                foo = CryptReleaseContext(hcp, 0);
+               pstmVersion->Release();
 
                for (int i = 0; i < HASHLENGTH; i++)
                {
@@ -3773,11 +3789,9 @@ HRESULT PinTable::LoadGameFromStorage(IStorage *pstgRoot)
       {
          IEditable * const piedit = m_vedit[t];
          if (piedit->GetISelect()->m_layerIndex == i)
-         {
             m_layer[i].push_back(piedit);
          }
       }
-   }
 
    return hr;
 }
@@ -6655,7 +6669,7 @@ void PinTable::Copy(int x, int y)
       ULONG writ = 0;
       pstm->Write(&type, sizeof(int), &writ);
 
-      pe->SaveData(pstm, NULL);
+       pe->SaveData(pstm, NULL, false);
 
       vstm.push_back(pstm);
    }
@@ -8548,6 +8562,7 @@ int PinTable::AddListItem(HWND hwndListView, char *szName, char *szValue1, LPARA
    return index;
 }
 
+std::mutex g_table_mutex;
 
 HRESULT PinTable::LoadImageFromStream(IStream *pstm, int version)
 {
