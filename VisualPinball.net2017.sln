@@ -5,6 +5,9 @@ MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "VPinball", "VisualPinball.net2017.vcxproj", "{11B81620-ADF1-46FB-98B0-AF83AB34CAAC}"
 EndProject
 Global
+	GlobalSection(Performance) = preSolution
+		HasPerformanceSessions = true
+	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug_SDL|x64 = Debug_SDL|x64
 		Debug_SDL|x86 = Debug_SDL|x86
@@ -38,5 +41,8 @@ Global
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {E3F6B7D0-766A-48E3-9E7B-FE87E6A14AE0}
+	EndGlobalSection
+	GlobalSection(Performance) = preSolution
+		HasPerformanceSessions = true
 	EndGlobalSection
 EndGlobal
