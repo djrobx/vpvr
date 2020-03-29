@@ -18,9 +18,9 @@
     <LocalDebuggerCommand>C:\Games\Visual PinballX\VPinballX.exe</LocalDebuggerCommand>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug_SDL|Win32'">
-    <LocalDebuggerWorkingDirectory>C:\Games\Visual PinballX\</LocalDebuggerWorkingDirectory>
+    <LocalDebuggerWorkingDirectory>C:\Visual Pinball</LocalDebuggerWorkingDirectory>
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
-    <LocalDebuggerCommand>C:\Games\Visual PinballX\VPinballX_GL.exe</LocalDebuggerCommand>
+    <LocalDebuggerCommand>C:\Visual Pinball\VPinballX_GL.exe</LocalDebuggerCommand>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LocalDebuggerCommand>C:\Games\Visual PinballX\VPinballX.exe</LocalDebuggerCommand>
@@ -28,9 +28,9 @@
     <LocalDebuggerWorkingDirectory>C:\Games\Visual PinballX\</LocalDebuggerWorkingDirectory>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release_SDL|Win32'">
-    <LocalDebuggerCommand>C:\Games\Visual PinballX\VPinballX_GL.exe</LocalDebuggerCommand>
+    <LocalDebuggerCommand>C:\Visual Pinball\VPinballX_GL.exe</LocalDebuggerCommand>
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
-    <LocalDebuggerWorkingDirectory>C:\Games\Visual PinballX\</LocalDebuggerWorkingDirectory>
+    <LocalDebuggerWorkingDirectory>C:\Visual Pinball\</LocalDebuggerWorkingDirectory>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LocalDebuggerCommand>C:\Games\Visual PinballX\VPinballX.exe</LocalDebuggerCommand>

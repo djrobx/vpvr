@@ -5010,7 +5010,7 @@ void PinTable::DoContextMenu(int x, int y, const int menuid, ISelect *psel)
    pt.y = y;
    ::ClientToScreen(m_hwnd, &pt);
 
-   HMENU hmenumain;
+   HMENU hmenumain = NULL;
    HMENU hmenu;
    if (menuid != -1)
    {
@@ -5167,7 +5167,6 @@ void PinTable::DoContextMenu(int x, int y, const int menuid, ISelect *psel)
       {
          fLocked = FMutilSelLocked();
       }
-
       CheckMenuItem(hmenu, ID_LOCK, MF_BYCOMMAND | (fLocked ? MF_CHECKED : MF_UNCHECKED));
    }
 
@@ -5180,7 +5179,7 @@ void PinTable::DoContextMenu(int x, int y, const int menuid, ISelect *psel)
 
    DestroyMenu(hmenu);
 
-   if (menuid != -1)
+   if (menuid != -1 && hmenumain!=NULL)
    {
       DestroyMenu(hmenumain);
    }

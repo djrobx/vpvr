@@ -43,7 +43,7 @@ void captureCheckTextures()
       }
       g_pplayer->m_texPUP = g_pplayer->m_texPUP->CreateFromHBitmap(ecPUP.m_HBitmap);
       ecPUP.m_pData = g_pplayer->m_texPUP->data();
-      ecDMDStage = ecCapturing;
+      ecPUPStage = ecCapturing;
    }
 
 }
@@ -58,15 +58,16 @@ void captureFindPUP()
       GetWindowRect(target, &r);
       if (ecPUP.SetupCapture(r))
       {
-         ecDMDStage = ecTexture;
+         ecPUPStage = ecTexture;
       }
       else
       {
-         ecDMDStage = ecFailure;
+         ecPUPStage = ecFailure;
       }
    }
 }
 
+clock_t dmddelay = 0;
 
 void captureFindDMD()
 {
@@ -77,6 +78,12 @@ void captureFindDMD()
       target = FindWindowA(NULL, "PUPSCREEN1"); // PupDMD
    if (target != NULL)
    {
+	   if (dmddelay == 0)
+	   {
+		   dmddelay = clock() + 1 * CLOCKS_PER_SEC;
+	   }
+	   if (clock() < dmddelay)
+		   return;
       RECT r;
       GetWindowRect(target, &r);
       if (ecDMD.SetupCapture(r))
@@ -96,7 +103,7 @@ void captureThread()
    {
       if (ecDMDStage == ecSearching)
          captureFindDMD();
-      if (ecPUPStage == ecCapturing)
+      if (ecDMDStage == ecCapturing)
       {
          ecDMD.GetFrame();
          g_pplayer->m_pin3d.m_pd3dPrimaryDevice->m_texMan.SetDirty(g_pplayer->m_texdmd);
@@ -128,6 +135,7 @@ void captureStop()
    if (threadCap.joinable())
       threadCap.join();
    ExtCapture::Dispose();
+   ecDMDStage = ecPUPStage = ecUninitialized;
 }
 
 bool capturePUP()
@@ -168,6 +176,11 @@ bool ExtCapture::SetupCapture(RECT inputRect)
    m_Width = m_Rect.right - m_Rect.left;
    m_Height = m_Rect.bottom - m_Rect.top;
 
+   if (m_Adapter)
+	   m_Adapter->Release();
+   if (m_Output)
+	   m_Output->Release();
+
    /* Retrieve a IDXGIFactory that can enumerate the adapters. */
    IDXGIFactory1* factory = NULL;
    HRESULT hr = CreateDXGIFactory1(__uuidof(IDXGIFactory1), (void**)(&factory));
@@ -187,16 +200,29 @@ bool ExtCapture::SetupCapture(RECT inputRect)
    bool found = false;
    while (!found && DXGI_ERROR_NOT_FOUND != factory->EnumAdapters1(i, &m_Adapter)) {
       ++i;
-      while (!found && DXGI_ERROR_NOT_FOUND != m_Adapter->EnumOutputs(dx, &m_Output)) {
-         ++dx;
-
-         hr = m_Output->GetDesc(&m_outputdesc);
-         if (PtInRect(&m_outputdesc.DesktopCoordinates, pt))
-         {
-            found = true;
-            m_DispLeft = pt.x - m_outputdesc.DesktopCoordinates.left;
-            m_DispTop = pt.y - m_outputdesc.DesktopCoordinates.top;
-         }
+	  if(m_Adapter)
+	  { 
+		  while (!found && DXGI_ERROR_NOT_FOUND != m_Adapter->EnumOutputs(dx, &m_Output)) {
+			  ++dx;
+			  if (m_Output)
+			  {
+				  hr = m_Output->GetDesc(&m_outputdesc);
+				  if (PtInRect(&m_outputdesc.DesktopCoordinates, pt))
+				  {
+					  found = true;
+					  m_DispLeft = pt.x - m_outputdesc.DesktopCoordinates.left;
+					  m_DispTop = pt.y - m_outputdesc.DesktopCoordinates.top;
+				  }
+				  else
+				  {
+					  m_Output->Release();
+				  }
+			  }
+		  }
+		  if (!found)
+		  {
+			  m_Adapter->Release();
+		  }
       }
    }
    if (!found)
@@ -251,8 +277,8 @@ bool ExtCapture::SetupCapture(RECT inputRect)
 
    /* Create the staging texture that we need to download the pixels from gpu. */
    D3D11_TEXTURE2D_DESC tex_desc;
-   tex_desc.Width = m_outputdesc.DesktopCoordinates.right;
-   tex_desc.Height = m_outputdesc.DesktopCoordinates.bottom;
+   tex_desc.Width = m_outputdesc.DesktopCoordinates.right-m_outputdesc.DesktopCoordinates.left;
+   tex_desc.Height = m_outputdesc.DesktopCoordinates.bottom-m_outputdesc.DesktopCoordinates.top;
    tex_desc.MipLevels = 1;
    tex_desc.ArraySize = 1; /* When using a texture array. */
    tex_desc.Format = DXGI_FORMAT_B8G8R8A8_UNORM; /* This is the default data when using desktop duplication, see https://msdn.microsoft.com/en-us/library/windows/desktop/hh404611(v=vs.85).aspx */
@@ -391,13 +417,14 @@ void ExtCapture::GetFrame()
    }
 
 
-   uint8_t* sptr = reinterpret_cast<uint8_t*>(data) + pitch * (m_Height + m_DispTop) - pitch;
+ //  uint8_t* sptr = reinterpret_cast<uint8_t*>(data) + pitch * (m_Height + m_DispTop) - pitch;
+   uint8_t* sptr = reinterpret_cast<uint8_t*>(data) + pitch * m_DispTop;
    uint8_t* ddptr = (uint8_t *)m_pData;
 
    for (size_t h = 0; h < m_Height; ++h)
    {
       memcpy_s(ddptr, m_Width * 4, sptr + (m_DispLeft * 4), m_Width * 4);
-      sptr -= pitch;
+      sptr += pitch;
       ddptr += m_Width * 4;
    }
 
