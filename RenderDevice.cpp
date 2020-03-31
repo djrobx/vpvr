@@ -742,7 +742,7 @@ void RenderDevice::CreateDevice(int &refreshrate, UINT adapterIndex)
          SDL_WINDOW_OPENGL | SDL_WINDOW_SHOWN | (m_fullscreen ? SDL_WINDOW_FULLSCREEN : 0));
    else
       m_sdl_playfieldHwnd = SDL_CreateWindow(
-         "Visual Pinball Player SDL", disp_x + (disp_w - 640) / 2, disp_y + (disp_h - 480) / 2, 640, 480,
+         "Visual Pinball Player SDL", disp_x + (disp_w - 10), disp_y + (disp_h - 10), 10, 10,
          SDL_WINDOW_OPENGL | SDL_WINDOW_HIDDEN);
 
    SDL_SysWMinfo wmInfo;
