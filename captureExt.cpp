@@ -205,6 +205,7 @@ bool ExtCapture::SetupCapture(RECT inputRect)
       ++i;
 	  if(m_Adapter)
 	  { 
+        dx = 0;
 		  while (!found && DXGI_ERROR_NOT_FOUND != m_Adapter->EnumOutputs(dx, &m_Output)) {
 			  ++dx;
 			  if (m_Output)
