@@ -734,7 +734,7 @@ void RenderDevice::CreateDevice(int &refreshrate, UINT adapterIndex)
    int disp_x, disp_y, disp_w, disp_h;
    getDisplaySetupByID(m_adapter, disp_x, disp_y, disp_w, disp_h);
 
-   bool disableVRPreview = (m_stereo3D == STEREO_VR) && (LoadValueIntWithDefault("PlayerVR", "VRPreviewDisabled", 0) > 0);
+   bool disableVRPreview = /*(m_stereo3D == STEREO_VR) && */ (LoadValueIntWithDefault("PlayerVR", "VRPreviewDisabled", 0) > 0);
 
    if (disableVRPreview == 0)
       m_sdl_playfieldHwnd = SDL_CreateWindow(

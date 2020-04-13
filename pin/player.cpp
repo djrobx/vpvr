@@ -1391,6 +1391,12 @@ HRESULT Player::Init(PinTable * const ptable, const HWND hwndProgress, const HWN
          x = LoadValueIntWithDefault((m_stereo3D == STEREO_VR) ? "PlayerVR" : "Player", "WindowPosX", x); //!! does this handle multi-display correctly like this?
          y = LoadValueIntWithDefault((m_stereo3D == STEREO_VR) ? "PlayerVR" : "Player", "WindowPosY", y);
          m_ShowWindowedCaption = false;
+		 bool disableVRPreview = (m_stereo3D == STEREO_VR) && (LoadValueIntWithDefault("PlayerVR", "VRPreviewDisabled", 0) > 0);
+		 if (disableVRPreview)
+		 {
+			 x = 0; y = 0; m_width = 1, m_height = 1;
+		 }
+
          int windowflags = WS_POPUP;
          SetWindowLong(m_playfieldHwnd, GWL_STYLE, windowflags);
          SetWindowPos(m_playfieldHwnd, NULL, x, y, m_width, m_height, SWP_NOOWNERZORDER | SWP_NOZORDER | SWP_NOACTIVATE | SWP_FRAMECHANGED);
@@ -4576,6 +4582,7 @@ void Player::Render()
 #ifndef ENABLE_SDL
             SetWindowLong(m_playfieldHwnd, GWL_EXSTYLE, windowflagsex);
 #endif
+
             SetWindowPos(m_playfieldHwnd, NULL, x, y, m_width, m_height, SWP_NOOWNERZORDER | SWP_NOZORDER | SWP_NOACTIVATE | SWP_FRAMECHANGED);
             ShowWindow(m_playfieldHwnd, SW_SHOW);
             // Save position of non-fullscreen player window to registry, and only if it was potentially moved around (i.e. when caption was already visible)
