@@ -1204,35 +1204,46 @@ void Primitive::RenderObject()
 
       const vec4 tmp(m_d.m_fDisableLightingTop, m_d.m_fDisableLightingBelow, 0.f, 0.f);
       pd3dDevice->basicShader->SetDisableLighting(tmp);
+	  Texture * const nMap = m_ptable->GetImage(m_d.m_szNormalMap);
 
-      Texture * const pin = m_ptable->GetImage(m_d.m_szImage);
-      Texture * const nMap = m_ptable->GetImage(m_d.m_szNormalMap);
+	  if (g_pplayer->m_texPUP && stricmp(m_d.m_szImage, "backglassimage")==0)
+	  {
+		  pd3dDevice->basicShader->SetTechnique("basic_with_texture");
+		  pd3dDevice->basicShader->SetTexture("Texture0", pd3dDevice->m_texMan.LoadTexture(g_pplayer->m_texPUP, true), false);
+		
+		  //g_pplayer->m_pin3d.SetPrimaryTextureFilter(0, TEXTURE_MODE_TRILINEAR);
+		  // accommodate models with UV coords outside of [0,1]
+		  pd3dDevice->SetTextureAddressMode(0, RenderDevice::TEX_WRAP);
+	  }
+	  else
+	  {
+		  Texture * const pin = m_ptable->GetImage(m_d.m_szImage);
 
-      if (pin && nMap)
-      {
-         pd3dDevice->basicShader->SetTechnique("basic_with_texture");
-         pd3dDevice->basicShader->SetTexture("Texture0", pin, false);
-         pd3dDevice->basicShader->SetTexture("Texture4", nMap, true);
-         pd3dDevice->basicShader->SetAlphaTestValue(pin->m_alphaTestValue * (float)(1.0 / 255.0));
-         //g_pplayer->m_pin3d.SetPrimaryTextureFilter(0, TEXTURE_MODE_TRILINEAR);
-         // accommodate models with UV coords outside of [0,1]
-         pd3dDevice->SetTextureAddressMode(0, RenderDevice::TEX_WRAP);
-      }
-      else if (pin)
-      {
-         pd3dDevice->basicShader->SetTechnique("basic_with_texture");
-         pd3dDevice->basicShader->SetTexture("Texture0", pin, false);
-         pd3dDevice->basicShader->SetAlphaTestValue(pin->m_alphaTestValue * (float)(1.0 / 255.0));
+		  if (pin && nMap)
+		  {
+			  pd3dDevice->basicShader->SetTechnique("basic_with_texture");
+			  pd3dDevice->basicShader->SetTexture("Texture0", pin, false);
+			  pd3dDevice->basicShader->SetTexture("Texture4", nMap, true);
+			  pd3dDevice->basicShader->SetAlphaTestValue(pin->m_alphaTestValue * (float)(1.0 / 255.0));
+			  //g_pplayer->m_pin3d.SetPrimaryTextureFilter(0, TEXTURE_MODE_TRILINEAR);
+			  // accommodate models with UV coords outside of [0,1]
+			  pd3dDevice->SetTextureAddressMode(0, RenderDevice::TEX_WRAP);
+		  }
+		  else if (pin)
+		  {
+			  pd3dDevice->basicShader->SetTechnique("basic_with_texture");
+			  pd3dDevice->basicShader->SetTexture("Texture0", pin, false);
+			  pd3dDevice->basicShader->SetAlphaTestValue(pin->m_alphaTestValue * (float)(1.0 / 255.0));
 
-         //g_pplayer->m_pin3d.SetPrimaryTextureFilter(0, TEXTURE_MODE_TRILINEAR);
-         // accommodate models with UV coords outside of [0,1]
-         pd3dDevice->SetTextureAddressMode(0, RenderDevice::TEX_WRAP);
-      }
-      else
-         pd3dDevice->basicShader->SetTechnique("basic_without_texture");
-
-      pd3dDevice->basicShader->SetBool("is_metal", mat->m_bIsMetal);
-      pd3dDevice->basicShader->SetBool("doNormalMapping", nMap);
+			  //g_pplayer->m_pin3d.SetPrimaryTextureFilter(0, TEXTURE_MODE_TRILINEAR);
+			  // accommodate models with UV coords outside of [0,1]
+			  pd3dDevice->SetTextureAddressMode(0, RenderDevice::TEX_WRAP);
+		  }
+		  else
+			  pd3dDevice->basicShader->SetTechnique("basic_without_texture");
+	  }
+	  pd3dDevice->basicShader->SetBool("doNormalMapping", nMap);
+	  pd3dDevice->basicShader->SetBool("is_metal", mat->m_bIsMetal);
 
       // set transform
       g_pplayer->UpdateBasicShaderMatrix(&fullMatrix);
