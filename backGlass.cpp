@@ -86,6 +86,10 @@ BackGlass::BackGlass(RenderDevice* const pd3dDevice,Texture * backgroundFallback
    backglass_width = 0;
    backglass_height = 0;
    backglass_scale = 1.2f;
+   dmd_width = 0;
+   dmd_height = 0;
+   dmd_x = 0;
+   dmd_y = 0;
    try {
       rapidxml::file<> b2sFile(b2sFileName.c_str());
       rapidxml::xml_document<> b2sTree;
@@ -212,10 +216,27 @@ void BackGlass::Render()
       float tableWidth, glassHeight;
       g_pplayer->m_ptable->get_Width(&tableWidth);
       g_pplayer->m_ptable->get_GlassHeight(&glassHeight);
-      if (backglass_width > 0 && backglass_height > 0)
-         m_pd3dDevice->DMDShader->SetVector("backBoxSize", tableWidth * (0.5f - backglass_scale / 2.0f), glassHeight, backglass_scale * tableWidth, backglass_scale * tableWidth / (float)backglass_width*(float)backglass_height);
-      else
-         m_pd3dDevice->DMDShader->SetVector("backBoxSize", tableWidth * (0.5f - backglass_scale / 2.0f), glassHeight, backglass_scale * tableWidth, backglass_scale * tableWidth / 16.0f*9.0f);
+
+	  if (g_pplayer->m_texdmd)
+	  {
+		  // If we expect a DMD the captured image is probably missing a grill in 3scr mode
+    	  // 3scr mode preferable to support VR rooms, so better to just drop the grills in this experimental mode.
+		  int dmdheightoff = (backglass_scale * tableWidth / 16.0f*9.0f) * .3;
+		  int dmdheightextra = tableWidth * .05;
+		  glassHeight += dmdheightoff+dmdheightextra;
+		 
+		  m_pd3dDevice->DMDShader->SetVector("backBoxSize", tableWidth * (0.5f - backglass_scale / 2.0f), glassHeight, backglass_scale * tableWidth, backglass_scale * tableWidth / 16.0f*9.0f);
+		
+		  // We lost the grille, so make a nice big DMD.
+		  dmd_width = 0.8f;
+	      dmd_height = dmd_width / 4.0f;
+		  dmd_x = tableWidth * (0.5f - dmd_width / 2.0f);
+		  dmd_y = -dmdheightoff + dmdheightextra/2;
+
+	  }
+	  else
+		  m_pd3dDevice->DMDShader->SetVector("backBoxSize", tableWidth * (0.5f - backglass_scale / 2.0f), glassHeight, backglass_scale * tableWidth, backglass_scale * tableWidth / 4.0f*3.0f);
+
    }
 
    if (m_backgroundTexture)
@@ -284,7 +305,8 @@ void BackGlass::DMDdraw(const float DMDposx, const float DMDposy, const float DM
                dmd_height = backglass_scale * scale * (float)backglass_grill_height / (float)backglass_width;
                dmd_width = dmd_height / (float)(g_pplayer->m_texdmd->height()) * (float)(g_pplayer->m_texdmd->width());
                dmd_x = tableWidth * (0.5f - dmd_width / 2.0f);
-               dmd_y = (tableWidth * (float)backglass_grill_height*(0.5f - scale / 2.0f) / (float)backglass_width);
+			   dmd_y = (tableWidth * (float)backglass_grill_height*(0.5f - scale / 2.0f) / (float)backglass_width);
+			 
             }
          }
          m_pd3dDevice->DMDShader->SetVector("quadOffsetScale", dmd_x, dmd_y, dmd_width, dmd_height);

@@ -2611,6 +2611,9 @@ void RenderDevice::DrawPrimitiveVB(const PrimitveTypes type, const DWORD fvf, Ve
 
 void RenderDevice::DrawIndexedPrimitiveVB(const PrimitveTypes type, const DWORD fvf, VertexBuffer* vb, const DWORD startVertex, const DWORD vertexCount, IndexBuffer* ib, const DWORD startIndex, const DWORD indexCount)
 {
+	if (vb == NULL || ib == NULL)
+		return;
+	
    const unsigned int np = ComputePrimitiveCount(type, indexCount);
    m_stats_drawn_triangles += np;
    vb->bind();

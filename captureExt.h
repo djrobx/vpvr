@@ -4,6 +4,8 @@
 #include <sal.h>
 #include <new>
 #include <warning.h>
+#include <list>
+#include <string>
 #include <DirectXMath.h>
 
 bool captureExternalDMD();
@@ -11,6 +13,8 @@ void captureFindPUP();
 bool capturePUP();
 void captureStartup();
 void captureStop();
+
+enum ecStage { ecSearching, ecFoundWaiting, ecTexture, ecFailure, ecCapturing, ecUninitialized };
 
 class ExtCaptureOutput
 {
@@ -25,6 +29,8 @@ typedef std::map<std::tuple<int, int>, ExtCaptureOutput> outputmaptype;
 class ExtCapture
 {
    static outputmaptype m_duplicatormap;
+   std::list<string> m_searchWindows;
+   int m_delay;
 
    IDXGIAdapter1* m_Adapter = NULL;
    IDXGIOutput1* m_Output1 = NULL;
@@ -43,9 +49,13 @@ class ExtCapture
    bool m_BitMapProcessing = false;
    bool m_Success = false;
 
-public:
-
    bool SetupCapture(RECT inputRect);
+
+public:
+   ecStage ecStage = ecUninitialized;
+
+   void Setup(std::list<string> windowlist);
+   void SearchWindow();
    void GetFrame();
    HBITMAP m_HBitmap;
    void *m_pData;

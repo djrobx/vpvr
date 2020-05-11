@@ -10,9 +10,7 @@
 // 5. Fill texture data periodically.
 
 
-enum ecStage { ecSearching, ecTexture, ecFailure, ecCapturing, ecUninitialized };
 ExtCapture ecDMD, ecPUP;
-ecStage ecDMDStage = ecUninitialized, ecPUPStage = ecUninitialized;
 bool StopCapture;
 std::thread threadCap;
 
@@ -22,7 +20,7 @@ std::thread threadCap;
 
 void captureCheckTextures()
 {
-   if (ecDMDStage == ecTexture)
+   if (ecDMD.ecStage == ecTexture)
    {
       if (g_pplayer->m_texdmd != NULL)
       {
@@ -32,9 +30,9 @@ void captureCheckTextures()
       // Sleaze alert! - ec creates a HBitmap, but we hijack ec's data pointer to dump its data directly into VP's texture
       g_pplayer->m_texdmd = g_pplayer->m_texdmd->CreateFromHBitmap(ecDMD.m_HBitmap);
       ecDMD.m_pData = g_pplayer->m_texdmd->data();
-      ecDMDStage = ecCapturing;
+      ecDMD.ecStage = ecCapturing;
    }
-   if (ecPUPStage == ecTexture)
+   if (ecPUP.ecStage == ecTexture)
    {
       if (g_pplayer->m_texPUP != NULL)
       {
@@ -43,58 +41,9 @@ void captureCheckTextures()
       }
       g_pplayer->m_texPUP = g_pplayer->m_texPUP->CreateFromHBitmap(ecPUP.m_HBitmap);
       ecPUP.m_pData = g_pplayer->m_texPUP->data();
-      ecPUPStage = ecCapturing;
+      ecPUP.ecStage = ecCapturing;
    }
 
-}
-
-void captureFindPUP()
-{
-   HWND target = FindWindowA(NULL, "PUPSCREEN2"); // PUP Window
-
-   if (target != NULL)
-   {
-      RECT r;
-      GetWindowRect(target, &r);
-      if (ecPUP.SetupCapture(r))
-      {
-         ecPUPStage = ecTexture;
-      }
-      else
-      {
-         ecPUPStage = ecFailure;
-      }
-   }
-}
-
-clock_t dmddelay = 0;
-
-void captureFindDMD()
-{
-   HWND target = FindWindowA(NULL, "Virtual DMD"); // Freezys and UltraDMD
-   if (target == NULL)
-      target = FindWindowA("pygame", NULL); // P-ROC DMD (CCC Reloaded)
-   if (target == NULL)
-      target = FindWindowA(NULL, "PUPSCREEN1"); // PupDMD
-   if (target != NULL)
-   {
-	   if (dmddelay == 0)
-	   {
-		   dmddelay = clock() + 1 * CLOCKS_PER_SEC;
-	   }
-	   if (clock() < dmddelay)
-		   return;
-      RECT r;
-      GetWindowRect(target, &r);
-      if (ecDMD.SetupCapture(r))
-      {
-         ecDMDStage = ecTexture;
-      }
-      else
-      {
-         ecDMDStage = ecFailure;
-      }
-   }
 }
 
 void captureThread()
@@ -103,17 +52,19 @@ void captureThread()
 
    while (!StopCapture)
    {
-      if (ecDMDStage == ecSearching)
-         captureFindDMD();
-      if (ecDMDStage == ecCapturing)
+      if (ecDMD.ecStage == ecSearching)
+         ecDMD.SearchWindow();
+      if (ecDMD.ecStage == ecCapturing)
       {
          ecDMD.GetFrame();
          g_pplayer->m_pin3d.m_pd3dPrimaryDevice->m_texMan.SetDirty(g_pplayer->m_texdmd);
       }
 
-      if(ecPUPStage == ecSearching)
-         captureFindPUP();
-      if (ecPUPStage == ecCapturing)
+	  if (ecPUP.ecStage == ecSearching)
+	  {
+		  ecPUP.SearchWindow();
+	  }
+      if (ecPUP.ecStage == ecCapturing)
       {
          ecPUP.GetFrame();
          g_pplayer->m_pin3d.m_pd3dPrimaryDevice->m_texMan.SetDirty(g_pplayer->m_texPUP);
@@ -124,8 +75,12 @@ void captureThread()
 
 void captureStartup()
 {
-   ecDMDStage = g_pplayer->m_capExtDMD ? ecSearching : ecFailure;
-   ecPUPStage = g_pplayer->m_capPUP ? ecSearching : ecFailure;
+   std::list<string> dmdlist = { "Virtual DMD", "pygame", "PUPSCREEN1", "formDMD" };
+   ecDMD.Setup(dmdlist);
+   std::list<string> puplist = { "PUPSCREEN2", "Form1" };
+   ecPUP.Setup(puplist);
+   ecDMD.ecStage = g_pplayer->m_capExtDMD ? ecSearching : ecFailure;
+   ecPUP.ecStage = g_pplayer->m_capPUP ? ecSearching : ecFailure;
    StopCapture = false;
    std::thread t(captureThread);
    threadCap = move(t);
@@ -137,19 +92,19 @@ void captureStop()
    if (threadCap.joinable())
       threadCap.join();
    ExtCapture::Dispose();
-   ecDMDStage = ecPUPStage = ecUninitialized;
+   ecDMD.ecStage = ecPUP.ecStage = ecUninitialized;
 }
 
 bool capturePUP()
 {
-   if (ecPUPStage == ecUninitialized)
+   if (ecPUP.ecStage == ecUninitialized)
    {
       captureStartup();
       return false;
    }
-   if (ecPUPStage == ecFailure)
+   if (ecPUP.ecStage == ecFailure)
       return false;
-   if (ecPUPStage == ecCapturing)
+   if (ecPUP.ecStage == ecCapturing)
       return true;
    captureCheckTextures();
    return false;
@@ -157,20 +112,62 @@ bool capturePUP()
 
 bool captureExternalDMD()
 {
-   if (ecPUPStage == ecUninitialized)
+   if (ecDMD.ecStage == ecUninitialized)
    {
       captureStartup();
       return false;
    }
-   if (ecDMDStage == ecFailure)
+   if (ecDMD.ecStage == ecFailure)
       return false;
-   if (ecDMDStage == ecCapturing)
-      return true;
    captureCheckTextures();
+   if (ecDMD.ecStage == ecCapturing)
+      return true;
    return false;
 }
 
 outputmaptype ExtCapture::m_duplicatormap;
+
+
+void ExtCapture::SearchWindow()
+{
+	HWND target = NULL;
+
+	for (const string & windowtext : m_searchWindows)
+	{
+		target = FindWindowA(NULL, windowtext.c_str());
+		if (target == NULL)
+			target = FindWindowA(windowtext.c_str(), NULL);
+		if (target != NULL)
+			break;
+	}
+	if (target != NULL)
+	{
+		if (m_delay == 0)
+		{
+			m_delay = clock() + 1 * CLOCKS_PER_SEC;
+		}
+		if (clock() < m_delay)
+			return;
+		RECT r;
+		GetWindowRect(target, &r);
+		if (SetupCapture(r))
+		{
+			ecStage = ecTexture;
+		}
+		else
+		{
+			ecStage = ecFailure;
+		}
+	}
+}
+
+void ExtCapture::Setup(std::list<string> windowlist)
+{
+	ecStage = ecUninitialized;
+	m_delay = 0;
+	m_searchWindows = windowlist;
+	m_pData = NULL;
+}
 
 bool ExtCapture::SetupCapture(RECT inputRect)
 {
