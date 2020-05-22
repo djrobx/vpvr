@@ -5447,8 +5447,8 @@ INT_PTR CALLBACK PauseProc(HWND hwndDlg, UINT uMsg, WPARAM wParam, LPARAM lParam
       GetWindowRect(hwndDlg, &rcDialog);
 
       SetWindowPos(hwndDlg, NULL,
-         (rcMain.right + rcMain.left) / 2 - (rcDialog.right - rcDialog.left) / 2,
-         (rcMain.bottom + rcMain.top) / 2 - (rcDialog.bottom - rcDialog.top) / 2,
+         (((rcMain.right + rcMain.left) / 2 - (rcDialog.right - rcDialog.left) / 2 >= 0) ? ((rcMain.right + rcMain.left) / 2 - (rcDialog.right - rcDialog.left) / 2) : GetSystemMetrics(SM_CXSCREEN) / 2 - (rcDialog.left + rcDialog.right / 2)),
+         (((rcMain.bottom + rcMain.top) / 2 - (rcDialog.bottom - rcDialog.top) / 2 >= 0) ? ((rcMain.bottom + rcMain.top) / 2 - (rcDialog.bottom - rcDialog.top) / 2) : GetSystemMetrics(SM_CYSCREEN) / 2 - (rcDialog.top + rcDialog.bottom / 2)),
          0, 0, SWP_NOOWNERZORDER | SWP_NOSIZE | SWP_NOZORDER | SWP_NOACTIVATE/* | SWP_NOMOVE*/);
 
       return TRUE;
