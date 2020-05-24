@@ -727,6 +727,122 @@ STOPUNDO
 return S_OK;
 }*/
 
+STDMETHODIMP ScriptGlobalTable::UpdateMaterial(BSTR pVal, float wrapLighting, float roughness, float glossyImageLerp, float thickness, float edge, float edgeAlpha, float opacity,
+   OLE_COLOR base, OLE_COLOR glossy, OLE_COLOR clearcoat, VARIANT_BOOL isMetal, VARIANT_BOOL opacityActive,
+   float elasticity, float elasticityFalloff, float friction, float scatterAngle)
+{
+   if (!g_pplayer)
+      return E_POINTER;
+
+   char Name[MAX_PATH];
+   WideCharToMultiByte(CP_ACP, 0, pVal, -1, Name, MAX_PATH, NULL, NULL);
+
+   Material * const pMat = m_pt->GetMaterial(Name);
+   if (pMat != &g_pvp->dummyMaterial)
+   {
+      pMat->m_fWrapLighting = wrapLighting;
+      pMat->m_fRoughness = roughness;
+      pMat->m_fGlossyImageLerp = glossyImageLerp;
+      pMat->m_fThickness = thickness;
+      pMat->m_fEdge = edge;
+      pMat->m_fEdgeAlpha = edgeAlpha;
+      pMat->m_fOpacity = opacity;
+      pMat->m_cBase = base;
+      pMat->m_cGlossy = glossy;
+      pMat->m_cClearcoat = clearcoat;
+      pMat->m_bIsMetal = VBTOb(isMetal);
+      pMat->m_bOpacityActive = VBTOb(opacityActive);
+      pMat->m_fElasticity = elasticity;
+      pMat->m_fElasticityFalloff = elasticityFalloff;
+      pMat->m_fFriction = friction;
+      pMat->m_fScatterAngle = scatterAngle;
+
+      return S_OK;
+   }
+   else
+      return E_FAIL;
+}
+
+STDMETHODIMP ScriptGlobalTable::GetMaterial(BSTR pVal, float *wrapLighting, float *roughness, float *glossyImageLerp, float *thickness, float *edge, float *edgeAlpha, float *opacity,
+   OLE_COLOR *base, OLE_COLOR *glossy, OLE_COLOR *clearcoat, VARIANT_BOOL *isMetal, VARIANT_BOOL *opacityActive,
+   float *elasticity, float *elasticityFalloff, float *friction, float *scatterAngle)
+{
+   if (!g_pplayer)
+      return E_POINTER;
+
+   char Name[MAX_PATH];
+   WideCharToMultiByte(CP_ACP, 0, pVal, -1, Name, MAX_PATH, NULL, NULL);
+
+   const Material * const pMat = m_pt->GetMaterial(Name);
+   if (pMat != &g_pvp->dummyMaterial)
+   {
+      *wrapLighting = pMat->m_fWrapLighting;
+      *roughness = pMat->m_fRoughness;
+      *glossyImageLerp = pMat->m_fGlossyImageLerp;
+      *thickness = pMat->m_fThickness;
+      *edge = pMat->m_fEdge;
+      *edgeAlpha = pMat->m_fEdgeAlpha;
+      *opacity = pMat->m_fOpacity;
+      *base = pMat->m_cBase;
+      *glossy = pMat->m_cGlossy;
+      *clearcoat = pMat->m_cClearcoat;
+      *isMetal = FTOVB(pMat->m_bIsMetal);
+      *opacityActive = FTOVB(pMat->m_bOpacityActive);
+      *elasticity = pMat->m_fElasticity;
+      *elasticityFalloff = pMat->m_fElasticityFalloff;
+      *friction = pMat->m_fFriction;
+      *scatterAngle = pMat->m_fScatterAngle;
+
+      return S_OK;
+   }
+   else
+      return E_FAIL;
+}
+
+STDMETHODIMP ScriptGlobalTable::UpdateMaterialPhysics(BSTR pVal, float elasticity, float elasticityFalloff, float friction, float scatterAngle)
+{
+   if (!g_pplayer)
+      return E_POINTER;
+
+   char Name[MAX_PATH];
+   WideCharToMultiByte(CP_ACP, 0, pVal, -1, Name, MAX_PATH, NULL, NULL);
+
+   Material * const pMat = m_pt->GetMaterial(Name);
+   if (pMat != &g_pvp->dummyMaterial)
+   {
+      pMat->m_fElasticity = elasticity;
+      pMat->m_fElasticityFalloff = elasticityFalloff;
+      pMat->m_fFriction = friction;
+      pMat->m_fScatterAngle = scatterAngle;
+
+      return S_OK;
+   }
+   else
+      return E_FAIL;
+}
+
+STDMETHODIMP ScriptGlobalTable::GetMaterialPhysics(BSTR pVal, float *elasticity, float *elasticityFalloff, float *friction, float *scatterAngle)
+{
+   if (!g_pplayer)
+      return E_POINTER;
+
+   char Name[MAX_PATH];
+   WideCharToMultiByte(CP_ACP, 0, pVal, -1, Name, MAX_PATH, NULL, NULL);
+
+   const Material * const pMat = m_pt->GetMaterial(Name);
+   if (pMat != &g_pvp->dummyMaterial)
+   {
+      *elasticity = pMat->m_fElasticity;
+      *elasticityFalloff = pMat->m_fElasticityFalloff;
+      *friction = pMat->m_fFriction;
+      *scatterAngle = pMat->m_fScatterAngle;
+
+      return S_OK;
+   }
+   else
+      return E_FAIL;
+}
+
 STDMETHODIMP ScriptGlobalTable::MaterialColor(BSTR pVal, OLE_COLOR newVal)
 {
    if (!g_pplayer)
@@ -1306,6 +1422,16 @@ STDMETHODIMP ScriptGlobalTable::GetElementByName(BSTR name, IDispatch* *pVal)
    }
 
    *pVal = NULL;
+   return S_OK;
+}
+
+STDMETHODIMP ScriptGlobalTable::get_ActiveTable(ITable **pVal)
+{
+   if (!pVal || !g_pplayer)
+      return E_POINTER;
+
+   m_pt->QueryInterface(IID_ITable, (void**)pVal);
+
    return S_OK;
 }
 

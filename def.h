@@ -214,6 +214,7 @@ public:
 #define ANGTORAD(x) ((x) *(float)(M_PI/180.0))
 #define RADTOANG(x) ((x) *(float)(180.0/M_PI))
 
+#define VBTOb(x) (!!(x))
 #define VBTOF(x) ((x) ? fTrue : fFalse)
 #define FTOVB(x) ((x) ? -1 : 0)
 
