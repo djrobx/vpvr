@@ -736,14 +736,14 @@ void RenderDevice::CreateDevice(int &refreshrate, UINT adapterIndex)
 
    bool disableVRPreview = /*(m_stereo3D == STEREO_VR) && */ (LoadValueIntWithDefault("PlayerVR", "VRPreviewDisabled", 0) > 0);
 
-   if (disableVRPreview == 0)
-      m_sdl_playfieldHwnd = SDL_CreateWindow(
-         "Visual Pinball Player SDL", disp_x + (disp_w - m_width) / 2, disp_y + (disp_h - m_height) / 2, m_width, m_height,
-         SDL_WINDOW_OPENGL | SDL_WINDOW_SHOWN | (m_fullscreen ? SDL_WINDOW_FULLSCREEN : 0));
-   else
+   if (m_stereo3D == STEREO_VR && disableVRPreview == 1)
       m_sdl_playfieldHwnd = SDL_CreateWindow(
          "Visual Pinball Player SDL", disp_x + (disp_w - 10), disp_y + (disp_h - 10), 10, 10,
          SDL_WINDOW_OPENGL | SDL_WINDOW_HIDDEN);
+   else
+      m_sdl_playfieldHwnd = SDL_CreateWindow(
+         "Visual Pinball Player SDL", disp_x + (disp_w - m_width) / 2, disp_y + (disp_h - m_height) / 2, m_width, m_height,
+         SDL_WINDOW_OPENGL | SDL_WINDOW_SHOWN | (m_fullscreen ? SDL_WINDOW_FULLSCREEN : 0));
 
    SDL_SysWMinfo wmInfo;
    SDL_VERSION(&wmInfo.version);
