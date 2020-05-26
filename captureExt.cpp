@@ -425,6 +425,7 @@ void ExtCapture::GetFrame()
       memcpy_s(ddptr, m_Width * 4, sptr + (m_DispLeft * 4), m_Width * 4);
       sptr += pitch;
       ddptr += m_Width * 4;
+      Sleep(0);
    }
 
 }

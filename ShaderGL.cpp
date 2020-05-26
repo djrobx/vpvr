@@ -91,7 +91,7 @@ void LOG(int level, const char* fileNameRoot, string message) {
 }
 
 //parse a file. Is called recursively for includes
-bool parseFile(const char* fileNameRoot, const char* fileName, int level, std::map<string, string> &values, string parentMode) {
+bool parseFile(const char* fileNameRoot, const char* fileName, int level, std::unordered_map<string, string> &values, string parentMode) {
    if (level > 16) {//Can be increased, but looks very much like an infinite recursion.
       LOG(1, fileNameRoot, string("Reached more than 16 include while trying to include ").append(fileName).append("levels. Aborting..."));
       return false;
@@ -101,7 +101,7 @@ bool parseFile(const char* fileNameRoot, const char* fileName, int level, std::m
    }
    string line;
    string currentMode = parentMode;
-   std::map<string, string>::iterator currentElemIt = values.find(parentMode);
+   std::unordered_map<string, string>::iterator currentElemIt = values.find(parentMode);
    string currentElement = (currentElemIt != values.end()) ? currentElemIt->second : "";
    std::ifstream glfxFile;
    glfxFile.open(string(Shader::shaderPath).append(fileName), std::ifstream::in);
@@ -280,7 +280,7 @@ bool Shader::compileGLShader(const char* fileNameRoot, string shaderCodeName, st
 
       CHECKD3D(glGetProgramiv(shaderprogram, GL_ACTIVE_UNIFORMS, &count));
       char uniformName[256];
-      shader.uniformLocation = new std::map<string, uniformLoc>;
+      shader.uniformLocation = new std::unordered_map<string, uniformLoc>;
       for (int i = 0;i < count;++i) {
          GLenum type;
          int size;
@@ -331,7 +331,7 @@ bool Shader::compileGLShader(const char* fileNameRoot, string shaderCodeName, st
 
       CHECKD3D(glGetProgramiv(shaderprogram, GL_ACTIVE_ATTRIBUTES, &count));
       char attributeName[256];
-      shader.attributeLocation = new std::map<string, attributeLoc>;
+      shader.attributeLocation = new std::unordered_map<string, attributeLoc>;
       for (int i = 0;i < count;++i) {
          GLenum type;
          int size;
@@ -366,7 +366,7 @@ bool Shader::compileGLShader(const char* fileNameRoot, string shaderCodeName, st
 }
 
 //Check if technique is valid and replace %PARAMi% with the values in the function header
-string analyzeFunction(const char* shaderCodeName, string technique, string functionName, std::map<string, string> &values) {
+string analyzeFunction(const char* shaderCodeName, string technique, string functionName, std::unordered_map<string, string> &values) {
    int start, end;
    start = functionName.find("(");
    end = functionName.find(")");
@@ -374,7 +374,7 @@ string analyzeFunction(const char* shaderCodeName, string technique, string func
       LOG(2, (const char*)shaderCodeName, string("Invalid technique: ").append(technique));
       return "";
    }
-   std::map<string, string>::iterator it = values.find(functionName.substr(0, start));
+   std::unordered_map<string, string>::iterator it = values.find(functionName.substr(0, start));
    string functionCode = (it != values.end()) ? it->second : "";
    if (end > start + 1) {
       std::stringstream params(functionName.substr(start + 1, end - start - 1));
@@ -398,7 +398,7 @@ bool Shader::Load(const char* shaderCodeName, UINT codeSize)
    }
    m_currentTechnique = NULL;
    LOG(3, (const char*)shaderCodeName, "Start parsing file");
-   std::map<string, string> values;
+   std::unordered_map<string, string> values;
    bool success = parseFile((const char*)shaderCodeName, (const char*)shaderCodeName, 0, values, "GLOBAL");
    if (!success) {
       LOG(1, (const char*)shaderCodeName, "Parsing failed\n");
@@ -406,7 +406,7 @@ bool Shader::Load(const char* shaderCodeName, UINT codeSize)
    else {
       LOG(3, (const char*)shaderCodeName, "Parsing successful. Start compiling shaders");
    }
-   std::map<string, string>::iterator it = values.find("GLOBAL");
+   std::unordered_map<string, string>::iterator it = values.find("GLOBAL");
    string global = (it != values.end()) ? it->second : "";
 
    it = values.find("VERTEX");
@@ -539,8 +539,18 @@ void Shader::Begin(const unsigned int pass)
    m_currentShader = this;
    CHECKD3D();
    char msg[256];
-   string techName = string(technique).append("_P").append(std::to_string(pass));
-   auto tec = shaderList.find(techName);
+
+   // The string building here registers pretty high in cpu profiling, so doing it raw
+   char tn[259];
+   int len = strlen(technique);
+   memcpy(tn, technique, len);
+   char* ps = tn + len;
+   *ps++ = '_';
+   *ps++ = 'P';
+   *ps++ = '0' + pass;
+   *ps = 0;
+
+   auto tec = shaderList.find(tn);
    if (tec == shaderList.end()) {
       sprintf_s(msg, 256, "Could not find shader technique %s", technique);
       ShowError(msg);
@@ -724,7 +734,7 @@ void Shader::Begin(const unsigned int pass)
       }
       break;
       default:
-         sprintf_s(msg, 256, "Unknown uniform type 0x%0002X for %s in %s", currentUniform.type, it->first.c_str(), techName.c_str());
+         sprintf_s(msg, 256, "Unknown uniform type 0x%0002X for %s in %s", currentUniform.type, it->first.c_str(), tn);
          ShowError(msg);
       }
    }
@@ -817,6 +827,28 @@ void Shader::SetTechnique(const D3DXHANDLE technique)
 
 void Shader::SetUniformBlock(const D3DXHANDLE hParameter, const float* pMatrix, const int size)
 {
+#ifdef SPEEDUP_HACK
+    // hParameter is always "matrixBlock", max 5 * 16 ... create it once.
+   
+
+    if (ufloatp.data == NULL)
+    {
+        ufloatp.data = (float *)malloc(5 * 16 * sizeof(float));
+        uniformFloatP[hParameter] = ufloatp;
+    }
+    ufloatp.len = size;
+    memcpy(ufloatp.data, pMatrix, size * sizeof(float));
+
+    if (m_currentTechnique && lastShaderProgram == m_currentTechnique->program) {
+        auto location = m_currentTechnique->uniformLocation->find(hParameter);
+        if (location == m_currentTechnique->uniformLocation->end()) return;
+        CHECKD3D(glBindBuffer(GL_UNIFORM_BUFFER, location->second.blockBuffer));
+        CHECKD3D(glBufferData(GL_UNIFORM_BUFFER, sizeof(GLfloat) * size, ufloatp.data, GL_STREAM_DRAW));
+        CHECKD3D(glUniformBlockBinding(lastShaderProgram, location->second.location, 0));
+        CHECKD3D(glBindBufferRange(GL_UNIFORM_BUFFER, 0, location->second.blockBuffer, 0, sizeof(GLfloat) * size));
+    }
+
+#else
    auto element = uniformFloatP.find(hParameter);
    floatP elem;
    if ((element == uniformFloatP.end()) || (element->second.data == NULL)) {
@@ -830,8 +862,10 @@ void Shader::SetUniformBlock(const D3DXHANDLE hParameter, const float* pMatrix, 
    }
    else
       elem = element->second;
+
    memcpy(elem.data, pMatrix, size * sizeof(float));
    uniformFloatP[hParameter] = elem;
+
    if (m_currentTechnique && lastShaderProgram == m_currentTechnique->program) {
       auto location = m_currentTechnique->uniformLocation->find(hParameter);
       if (location == m_currentTechnique->uniformLocation->end()) return;
@@ -840,6 +874,7 @@ void Shader::SetUniformBlock(const D3DXHANDLE hParameter, const float* pMatrix, 
       CHECKD3D(glUniformBlockBinding(lastShaderProgram, location->second.location, 0));
       CHECKD3D(glBindBufferRange(GL_UNIFORM_BUFFER, 0, location->second.blockBuffer, 0, sizeof(GLfloat) * size));
    }
+#endif
 }
 
 void Shader::SetMatrix(const D3DXHANDLE hParameter, const Matrix3D* pMatrix)
