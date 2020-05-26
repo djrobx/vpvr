@@ -20,6 +20,9 @@ Shader::Shader(RenderDevice *renderDevice)
    m_renderDevice = renderDevice;
 #ifndef ENABLE_SDL
    m_shader = 0;
+#else
+   // for speedup hack
+   ufloatp.data = NULL;
 #endif
    for (unsigned int i = 0; i < TEXTURESET_STATE_CACHE_SIZE; ++i)
       currentTexture[i] = 0;

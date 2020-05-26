@@ -2638,6 +2638,7 @@ void RenderDevice::UpdateVRPosition()
 #ifdef ENABLE_VR
    if (!m_pHMD) return;
 
+
    vr::VRCompositor()->WaitGetPoses(m_rTrackedDevicePose, vr::k_unMaxTrackedDeviceCount, NULL, 0);
 
    for (int device = 0; device < vr::k_unMaxTrackedDeviceCount; device++) {

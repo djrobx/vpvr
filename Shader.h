@@ -97,18 +97,22 @@ private:
    };
    struct glShader {
       int program;
-      std::map<string, attributeLoc> *attributeLocation;
-      std::map<string, uniformLoc> *uniformLocation;
+      std::unordered_map<string, attributeLoc> *attributeLocation;
+      std::unordered_map<string, uniformLoc> *uniformLocation;
    };
    struct floatP {
       size_t len;
       float* data;
    };
-   std::map<string, glShader> shaderList;
-   std::map<string, float> uniformFloat;
-   std::map<string, floatP> uniformFloatP;
-   std::map<string, int> uniformInt;
-   std::map<string, int> uniformTex;
+
+   // for speedup hack..
+   floatP ufloatp = { 0, NULL };
+
+   std::unordered_map<string, glShader> shaderList;
+   std::unordered_map<string, float> uniformFloat;
+   std::unordered_map<string, floatP> uniformFloatP;
+   std::unordered_map<string, int> uniformInt;
+   std::unordered_map<string, int> uniformTex;
    char technique[256];
    static Matrix3D mWorld, mView, mProj[2];
    static int lastShaderProgram;
