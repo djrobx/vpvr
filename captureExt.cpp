@@ -9,11 +9,9 @@
 // 4. Wait for main thread to create texture.
 // 5. Fill texture data periodically.
 
-
 ExtCapture ecDMD, ecPUP;
 bool StopCapture;
 std::thread threadCap;
-
 
 // Call from VP's rendering loop.   Prepares textures once the sizes are detected by the 
 // capture thread. 
@@ -72,16 +70,7 @@ void captureThread()
 		if (ecPUP.ecStage == ecCapturing)
 		{
 			if (ecPUP.GetFrame())
-			{
-				::OutputDebugString("PUP dirty\n");
-
 				g_pplayer->m_pin3d.m_pd3dPrimaryDevice->m_texMan.SetDirty(g_pplayer->m_texPUP);
-			}
-			else
-			{
-				::OutputDebugString("PUP clean\n");
-			}
-
 		}
 		Sleep(5);
 	}
