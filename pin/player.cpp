@@ -3771,7 +3771,7 @@ void Player::RenderStereo(int stereo3D, bool shaderAA) {
          }
 
          m_pin3d.m_pd3dPrimaryDevice->StereoShader->SetTechnique("stereo_AMD_DEBUG");
-         m_pin3d.m_pd3dPrimaryDevice->StereoShader->SetTexture("Texture1", m_pin3d.m_pd3dPrimaryDevice->GetBackBufferSMAATexture(), true);
+         m_pin3d.m_pd3dPrimaryDevice->StereoShader->SetTexture("Texture0", m_pin3d.m_pd3dPrimaryDevice->GetBackBufferSMAATexture(), true);
 
          m_pin3d.m_pd3dPrimaryDevice->SetRenderTarget(leftTexture);
 
