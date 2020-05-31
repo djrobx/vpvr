@@ -550,6 +550,7 @@
 #define IDC_StretchMonitor              388
 #define DISPID_IMAGEMAPPING             389
 #define IDC_SSSLIDER                    389
+#define IDC_MSAASLIDER                  390
 #define IDD_PROPTABLE_LIGHTSOURCES      390
 #define IDD_SEARCH_SELECT_ELEMENT       391
 #define IDD_DRAWING_ORDER               392
@@ -1036,6 +1037,7 @@
 #define IDC_NEAR_LABEL                  837
 #define IDC_FAR_LABEL                   838
 #define IDC_CAP_PUP                     839
+#define IDC_MSAASLIDER_LABEL            843
 #define DISPID_Gate_Height1             1142
 #define DISPID_Image                    1500
 #define DISPID_Image2                   1501
