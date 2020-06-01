@@ -88,16 +88,14 @@ mat3 TBN_trafo(vec3 N, vec3 V, vec2 uv)
 
 vec3 normal_map(vec3 N, vec3 V, vec2 uv)
 {
-   return normalize((TBN_trafo(N, V, uv) * (textureLod(Texture4, uv, 0).xyz * (255./127.) - (128./127.))));
- //  vec3 tn = tex2D(Texture4, uv).xyz * (255./127.) - (128./127.); // Note that Blender apparently does export tangent space normalmaps for Z (Blue) at full range, so 0..255 -> 0..1, which misses an option for here!
+   vec3 tn = tex2D(Texture4, uv).xyz * (255./127.) - (128./127.); // Note that Blender apparently does export tangent space normalmaps for Z (Blue) at full range, so 0..255 -> 0..1, which misses an option for here!
 
- //  if (objectSpaceNormalMap)
- //  {
-  //    tn.z = -tn.z; // this matches the object space, +X +Y +Z, export/baking in Blender with our trafo setup
- //     return normalize( mul(tn, matWorldViewInverseTranspose).xyz );
-  // } else // tangent space
-  //    return normalize( mul(TBN_trafo(N, V, uv),
-  //                          tn) );
+   if (objectSpaceNormalMap)
+   {
+      tn.z = -tn.z; // this matches the object space, +X +Y +Z, export/baking in Blender with our trafo setup
+      return normalize( mul(tn, matWorldViewInverseTranspose).xyz );
+   } else // tangent space
+      return normalize( mul(tn, TBN_trafo(N, V, uv)));  // !! The order of tn, and TBN_trainfo matters here?  Ship on FishTales gets blown out if you reverse them 
 }  
 
 //------------------------------------
@@ -316,7 +314,7 @@ void main() {
 
       if (fDisableLighting_top_below.y < 1.0)
           // add light from "below" from user-flagged bulb lights, pre-rendered/blurred in previous renderpass //!! sqrt = magic
-          color.xyz += clamp(mix(sqrt(diffuse)*texture(Texture3, vec2(0.5*tex03.x,0.5*tex03.y)+0.5).xyz*color.a, vec3(0.), fDisableLighting_top_below.y),0.0,1.0); //!! depend on normal of light (unknown though) vs geom normal, too?
+          color.xyz += clamp(mix(sqrt(diffuse)*textureLod(Texture3, vec2(0.5*tex03.x,0.5*tex03.y)+0.5, 0).xyz*color.a, vec3(0.), fDisableLighting_top_below.y),0.0,1.0); //!! depend on normal of light (unknown though) vs geom normal, too?
    }
 }
 
