@@ -3333,6 +3333,8 @@ void Player::RenderDynamics()
 
    UpdateBallShaderMatrix();
 
+   DrawBulbLightBuffer(); // Move Bulb Light Drawing first so that all objects get the correct bulb texture.
+
    m_pin3d.RenderPlayfieldGraphics(false);
 
    for (size_t i = 0; i < m_ptable->m_vedit.size(); i++)
@@ -3385,8 +3387,6 @@ void Player::RenderDynamics()
          m_pin3d.m_gpu_profiler.Timestamp(GTS_NonTransparent);
       m_limiter.Execute(m_pin3d.m_pd3dPrimaryDevice); //!! move below other draw calls??
 #endif
-
-      DrawBulbLightBuffer();
 
 #ifdef FPS
       if (ProfilingMode() == 1)
