@@ -578,6 +578,8 @@ bool RenderDevice::isVRturnedOn()
       if (VRError == vr::VRInitError_None && vr::VRCompositor()) {
          for (int device = 0; device < vr::k_unMaxTrackedDeviceCount; device++) {
             if ((m_pHMD->GetTrackedDeviceClass(device) == vr::TrackedDeviceClass_HMD)) {
+               vr::VR_Shutdown();
+               m_pHMD = nullptr;
                return true;
             }
          }
