@@ -190,7 +190,7 @@ vec3 lightLoop(vec3 pos, vec3 N, vec3 V, vec3 diffuse, vec3 glossy, vec3 specula
 		  color += DoEnvmapGlossy(N, V, Ruv, glossy, Roughness_WrapL_Edge_Thickness.x);
 
 	   // 2nd Layer
-	   if(specularMax > 0.0)
+	   if(fix_normal_orientation && specularMax > 0.0)
 		  color = DoEnvmap2ndLayer(color, pos, N, V, NdotV, Ruv, specular);
    }
 
