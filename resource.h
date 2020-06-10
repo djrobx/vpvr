@@ -1,6 +1,6 @@
 //{{NO_DEPENDENCIES}}
-// Von Microsoft Visual C++ generierte Includedatei.
-// Verwendet durch vpinball_eng.rc
+// Microsoft Visual C++ generated include file.
+// Used by vpinball_eng.rc
 //
 #define DISPID_Textbox_BackColor        1
 #define DISPID_Textbox_FontColor        2
@@ -1020,6 +1020,7 @@
 #define IDC_GLOBAL_SSREFLECTION_CHECK   820
 #define IDC_GLOBAL_PFREFLECTION_CHECK   821
 #define IDC_BUMPER_SKIRT_ANIM           822
+#define IDC_GLOBAL_SSREFLECTION_CHECK2  822
 #define IDC_CUSTOM_PARAMS               823
 #define IDC_3D_STEREO_OFS_LABEL         824
 #define IDC_3D_STEREO_MS_LABEL          825

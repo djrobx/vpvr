@@ -203,6 +203,9 @@ BOOL VROptionsDialog::OnInitDialog()
    sprintf_s(tmp, 256, "%f", nudgeStrength);
    SetDlgItemTextA(IDC_NUDGE_STRENGTH, tmp);
 
+   const bool reflection = LoadValueBoolWithDefault("PlayerVR", "BallReflection", false);
+   SendMessage(GetDlgItem(IDC_GLOBAL_REFLECTION_CHECK).GetHwnd(), BM_SETCHECK, reflection ? BST_CHECKED : BST_UNCHECKED, 0);
+
    const float AAfactor = LoadValueFloatWithDefault("PlayerVR", "AAFactor", LoadValueBoolWithDefault("Player", "USEAA", false) ? 1.5f : 1.0f);
    const HWND hwndSSSlider = GetDlgItem(IDC_SSSLIDER).GetHwnd();
    SendMessage(hwndSSSlider, TBM_SETRANGE, fTrue, MAKELONG(0, AAfactorCount - 1));
@@ -577,6 +580,9 @@ void VROptionsDialog::OnOK()
 
    tmpStr = GetDlgItemTextA(IDC_NUDGE_STRENGTH);
    SaveValueString("PlayerVR", "NudgeStrength", tmpStr.c_str());
+
+   const bool reflection = (SendMessage(GetDlgItem(IDC_GLOBAL_REFLECTION_CHECK).GetHwnd(), BM_GETCHECK, 0, 0) != 0);
+   SaveValueBool("PlayerVR", "BallReflection", reflection);
 
    size_t fxaa = SendMessage(GetDlgItem(IDC_FXAACB).GetHwnd(), CB_GETCURSEL, 0, 0);
    if (fxaa == LB_ERR)

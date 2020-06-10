@@ -2288,12 +2288,12 @@ BEGIN
     CONTROL         "Enable",IDC_ENABLE_AO,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,258,18,72,10
     CONTROL         "Update in-game (quality)",IDC_DYNAMIC_AO,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,258,29,87,10
     CONTROL         "ScreenSpace Reflections",IDC_GLOBAL_SSREFLECTION_CHECK,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,154,9,97,10
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,154,23,97,10
     CONTROL         "Reflect Dynamic Elements",IDC_GLOBAL_PFREFLECTION_CHECK,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,154,19,97,10
-    LTEXT           "on Playfield (quality)",-1,164,29,80,10
-    LTEXT           "Visual Nudge Strength",-1,156,52,89,8
-    EDITTEXT        IDC_NUDGE_STRENGTH,253,49,36,12,ES_RIGHT | ES_AUTOHSCROLL
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,154,33,97,10
+    LTEXT           "on Playfield (quality)",-1,164,43,80,10
+    LTEXT           "Visual Nudge Strength",-1,156,59,89,8
+    EDITTEXT        IDC_NUDGE_STRENGTH,253,58,36,12,ES_RIGHT | ES_AUTOHSCROLL
     CONTROL         "Force Bloom Filter off (performance)",IDC_BLOOM_OFF,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,162,190,127,10
     PUSHBUTTON      "Reset to Defaults",IDC_DEFAULTS,154,369,63,14
@@ -2329,6 +2329,8 @@ BEGIN
     LTEXT           "VR far plane",IDC_FAR_LABEL,255,203,40,10
     EDITTEXT        IDC_FAR_PLANE,300,201,40,12,ES_RIGHT | ES_AUTOHSCROLL
     COMBOBOX        IDC_TURN_VR_ON,154,353,111,100,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
+    CONTROL         "Reflect Ball on Playfield",IDC_GLOBAL_REFLECTION_CHECK,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,154,13,97,10
 END
 
 
