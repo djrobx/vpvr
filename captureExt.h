@@ -6,6 +6,7 @@
 #include <warning.h>
 #include <list>
 #include <string>
+#include <mutex>
 #include <DirectXMath.h>
 
 bool captureExternalDMD();

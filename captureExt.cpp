@@ -44,6 +44,9 @@ void captureCheckTextures()
 
 }
 
+std::mutex mtx;
+std::condition_variable cv;
+
 void captureThread()
 {
 	SetThreadPriority(GetCurrentThread(), THREAD_PRIORITY_LOWEST);
@@ -72,7 +75,8 @@ void captureThread()
 			if (ecPUP.GetFrame())
 				g_pplayer->m_pin3d.m_pd3dPrimaryDevice->m_texMan.SetDirty(g_pplayer->m_texPUP);
 		}
-		Sleep(5);
+		std::unique_lock<std::mutex> lck(mtx);
+		cv.wait(lck);
 	}
 }
 
@@ -92,6 +96,7 @@ void captureStartup()
 void captureStop()
 {
 	StopCapture = true;
+	cv.notify_one();
 	if (threadCap.joinable())
 		threadCap.join();
 	ExtCapture::Dispose();
@@ -107,9 +112,11 @@ bool capturePUP()
 	}
 	if (ecPUP.ecStage == ecFailure)
 		return false;
+	captureCheckTextures();
+	cv.notify_one();
 	if (ecPUP.ecStage == ecCapturing)
 		return true;
-	captureCheckTextures();
+
 	return false;
 }
 
@@ -123,8 +130,10 @@ bool captureExternalDMD()
 	if (ecDMD.ecStage == ecFailure)
 		return false;
 	captureCheckTextures();
+	cv.notify_one();
 	if (ecDMD.ecStage == ecCapturing)
 		return true;
+
 	return false;
 }
 
