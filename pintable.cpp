@@ -7921,7 +7921,7 @@ Texture* PinTable::GetImage(const char * const szName) const
    // during playback, we use the hashtable for lookup
    if (!m_textureMap.empty())
    {
-      std::unordered_map<const char*, Texture*, StringHashFunctor, StringComparator>::const_iterator
+      eastl::unordered_map<const char*, Texture*, StringHashFunctor, StringComparator>::const_iterator
          it = m_textureMap.find(szName);
       if (it != m_textureMap.end())
          return it->second;
@@ -8304,7 +8304,7 @@ Material* PinTable::GetMaterial(const char * const szName) const
    // during playback, we use the hashtable for lookup
    if (!m_materialMap.empty())
    {
-      std::unordered_map<const char*, Material*, StringHashFunctor, StringComparator>::const_iterator
+      eastl::unordered_map<const char*, Material*, StringHashFunctor, StringComparator>::const_iterator
          it = m_materialMap.find(szName);
       if (it != m_materialMap.end())
          return it->second;

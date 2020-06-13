@@ -1018,7 +1018,7 @@ Vertex3Ds g_viewDir;
 static bool CompareHitableDepth(Hitable* h1, Hitable* h2)
 {
    // GetDepth approximates direction in view distance to camera; sort ascending
-   return h1->GetDepth(g_viewDir) >= h2->GetDepth(g_viewDir);
+   return h1->GetDepth(g_viewDir) > h2->GetDepth(g_viewDir);
 }
 
 static bool CompareHitableDepthInverse(Hitable* h1, Hitable* h2)
