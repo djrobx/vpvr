@@ -163,7 +163,6 @@ bool Shader::compileGLShader(const char* fileNameRoot, string shaderCodeName, st
    vertexSource[vertex.length()] = 0;
 
    vertexShader = glCreateShader(GL_VERTEX_SHADER);
-   CHECKD3D();
    CHECKD3D(glShaderSource(vertexShader, 1, &vertexSource, 0));
    CHECKD3D(glCompileShader(vertexShader));
 
@@ -187,7 +186,7 @@ bool Shader::compileGLShader(const char* fileNameRoot, string shaderCodeName, st
       geometrySource[geometry.length()] = 0;
 
       geometryShader = glCreateShader(GL_GEOMETRY_SHADER);
-      CHECKD3D();
+   
       CHECKD3D(glShaderSource(geometryShader, 1, &geometrySource, 0));
       CHECKD3D(glCompileShader(geometryShader));
 
@@ -212,7 +211,6 @@ bool Shader::compileGLShader(const char* fileNameRoot, string shaderCodeName, st
       fragmentSource[fragment.length()] = 0;
 
       fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
-      CHECKD3D();
       CHECKD3D(glShaderSource(fragmentShader, 1, &fragmentSource, 0));
       CHECKD3D(glCompileShader(fragmentShader));
 
@@ -287,7 +285,6 @@ bool Shader::compileGLShader(const char* fileNameRoot, string shaderCodeName, st
          int length;
          CHECKD3D(glGetActiveUniform(shader.program, (GLuint)i, 256, &length, &size, &type, uniformName));
          int location = glGetUniformLocation(shader.program, uniformName);
-         CHECKD3D();
          if (location >= 0) {
             uniformLoc newLoc;
             newLoc.location = location;
@@ -311,7 +308,6 @@ bool Shader::compileGLShader(const char* fileNameRoot, string shaderCodeName, st
          CHECKD3D(glGetActiveUniformBlockName(shader.program, (GLuint)i, 256, &length, uniformName));
          CHECKD3D(glGetActiveUniformBlockiv(shader.program, (GLuint)i, GL_UNIFORM_BLOCK_DATA_SIZE, &size));
          int location = glGetUniformBlockIndex(shader.program, uniformName);
-         CHECKD3D();
          if (location >= 0) {
             uniformLoc newLoc;
             newLoc.location = location;
@@ -338,7 +334,6 @@ bool Shader::compileGLShader(const char* fileNameRoot, string shaderCodeName, st
          int length;
          CHECKD3D(glGetActiveAttrib(shader.program, (GLuint)i, 256, &length, &size, &type, attributeName));
          int location = glGetAttribLocation(shader.program, attributeName);
-         CHECKD3D();
          if (location >= 0) {
             attributeLoc newLoc;
             newLoc.location = location;
@@ -537,7 +532,6 @@ void Shader::setAttributeFormat(DWORD fvf)
 void Shader::Begin(const unsigned int pass)
 {
    m_currentShader = this;
-   CHECKD3D();
    char msg[256];
 
    // The string building here registers pretty high in cpu profiling, so doing it raw
@@ -570,107 +564,306 @@ void Shader::Begin(const unsigned int pass)
    for (auto it = m_currentTechnique->uniformLocation->begin(); it != m_currentTechnique->uniformLocation->end(); it++)
    {
       uniformLoc currentUniform = it->second;
+      void* fv = it->second.m_fvct_value;
       switch (currentUniform.type) {
       case -1: {//Uniform blocks
-         auto valueFP = uniformFloatP.find(it->first);
-         CHECKD3D(glBindBuffer(GL_UNIFORM_BUFFER, currentUniform.blockBuffer));
-         CHECKD3D(glBufferData(GL_UNIFORM_BUFFER, currentUniform.size, valueFP->second.data, GL_STREAM_DRAW));
-         CHECKD3D(glUniformBlockBinding(lastShaderProgram, currentUniform.location, 0));
-         CHECKD3D(glBindBufferRange(GL_UNIFORM_BUFFER, 0, currentUniform.blockBuffer, 0, currentUniform.size));
+          if (!fv)
+          {
+              auto valueFP = uniformFloatP.find(it->first);
+              if (valueFP != uniformFloatP.end())
+              {
+                  fv = it->second.m_fvct_value = &valueFP->second;
+              }
+          }
+          if (fv)
+          {
+              CHECKD3D(glBindBuffer(GL_UNIFORM_BUFFER, currentUniform.blockBuffer));
+              CHECKD3D(glBufferData(GL_UNIFORM_BUFFER, currentUniform.size, ((floatP*)(fv))->data, GL_STREAM_DRAW));
+              CHECKD3D(glUniformBlockBinding(lastShaderProgram, currentUniform.location, 0));
+              CHECKD3D(glBindBufferRange(GL_UNIFORM_BUFFER, 0, currentUniform.blockBuffer, 0, currentUniform.size));
+          }
       }
       break;
       case GL_FLOAT:
       {
-         auto valueF = uniformFloat.find(it->first);
-            CHECKD3D(glUniform1f(currentUniform.location, (valueF != uniformFloat.end()) ? valueF->second : 0.0f));
+          if (!fv)
+          {
+              auto valueI = uniformFloat.find(it->first);
+              if (valueI != uniformFloat.end())
+              {
+                  fv = it->second.m_fvct_value = &valueI->second;
+              }
+          }
+          if (fv)
+          {
+              CHECKD3D(glUniform1f(currentUniform.location, *(float*)fv));
+          }
+          else
+          {
+              CHECKD3D(glUniform1f(currentUniform.location, 0));
+          }
       }
       break;
       case GL_BOOL:
       case GL_INT:
       {
-         auto valueI = uniformInt.find(it->first);
-            CHECKD3D(glUniform1i(currentUniform.location, (valueI != uniformInt.end()) ? valueI->second : 0));
+          if (!fv)
+          {
+              auto valueI = uniformInt.find(it->first);
+              if (valueI != uniformInt.end())
+              {
+                  fv = it->second.m_fvct_value = &valueI->second;
+              }
+          }
+          if (fv)
+          {
+              CHECKD3D(glUniform1i(currentUniform.location, *(int *)fv));
+          }
+          else
+          {
+              CHECKD3D(glUniform1i(currentUniform.location, 0));
+          }
+        
       }
       break;
       case GL_FLOAT_VEC2:
       {
-         auto valueFP = uniformFloatP.find(it->first);
-         if ((valueFP != uniformFloatP.end()) && valueFP->second.data)
-            {CHECKD3D(glUniform2f(currentUniform.location, valueFP->second.data[0], valueFP->second.data[1]));}
-         else 
-            {CHECKD3D(glUniform2f(currentUniform.location, 0.0f, 0.0f));}
+          if (!fv)
+          {
+              auto valueFP = uniformFloatP.find(it->first);
+              if (valueFP != uniformFloatP.end())
+              {
+                  fv = it->second.m_fvct_value = &valueFP->second;
+              }
+          }
+          if (fv)
+          {
+              CHECKD3D(glUniform2f(currentUniform.location, ((floatP*)(fv))->data[0], ((floatP*)(fv))->data[1]));
+          }
+          else
+          {
+              CHECKD3D(glUniform2f(currentUniform.location, 0.0f, 0.0f));
+          }
       }
       break;
       case GL_FLOAT_VEC3:
       {
-         auto valueFP = uniformFloatP.find(it->first);
-         if ((valueFP != uniformFloatP.end()) && valueFP->second.data)
-            {CHECKD3D(glUniform3f(currentUniform.location, valueFP->second.data[0], valueFP->second.data[1], valueFP->second.data[2]));}
-         else 
-            {CHECKD3D(glUniform3f(currentUniform.location, 0.0f, 0.0f, 0.0f));}
+          if (!fv)
+          {
+              auto valueFP = uniformFloatP.find(it->first);
+              if (valueFP != uniformFloatP.end())
+              {
+                  fv = it->second.m_fvct_value = &valueFP->second;
+              }
+          }
+          if (fv)
+          {
+              CHECKD3D(glUniform3f(currentUniform.location, ((floatP*)(fv))->data[0], ((floatP*)(fv))->data[1], ((floatP*)(fv))->data[2]));
+          }
+          else 
+          {
+              CHECKD3D(glUniform3f(currentUniform.location, 0.0f, 0.0f, 0.0f));
+          }
       }
       break;
       case GL_FLOAT_VEC4:
       {
-         auto valueFP = uniformFloatP.find(it->first);
-         if ((valueFP != uniformFloatP.end()) && valueFP->second.data)
-            {CHECKD3D(glUniform4fv(currentUniform.location, valueFP->second.len/4, valueFP->second.data));}
-         else 
-            {CHECKD3D(glUniform4f(currentUniform.location, 0.0f, 0.0f, 0.0f, 0.0f));}
+          if (!fv)
+          {
+              auto valueFP = uniformFloatP.find(it->first);
+              if (valueFP != uniformFloatP.end())
+              {
+                  fv = it->second.m_fvct_value = &valueFP->second;
+              }
+          }
+          if (fv)
+          {
+              {CHECKD3D(glUniform4fv(currentUniform.location, ((floatP*)(fv))->len / 4, ((floatP*)(fv))->data));}
+          }
+          else
+          {
+              CHECKD3D(glUniform4f(currentUniform.location, 0.0f, 0.0f, 0.0f, 0.0f));
+          }
       }
       break;
       case GL_FLOAT_MAT2:
       {
-         auto valueFP = uniformFloatP.find(it->first);
-         CHECKD3D(glUniformMatrix2fv(currentUniform.location, 1, GL_FALSE, ((valueFP != uniformFloatP.end()) && valueFP->second.data) ? valueFP->second.data : zeroData));
+          if (!fv)
+          {
+              auto valueFP = uniformFloatP.find(it->first);
+              if (valueFP != uniformFloatP.end())
+              {
+                  fv = it->second.m_fvct_value = &valueFP->second;
+              }
+          }
+          if (fv)
+          {
+              CHECKD3D(glUniformMatrix2fv(currentUniform.location, 1, GL_FALSE, ((floatP*)(fv))->data));
+          }
+          else
+          {
+              CHECKD3D(glUniformMatrix2fv(currentUniform.location, 1, GL_FALSE, zeroData));
+          }
       }
       break;
       case GL_FLOAT_MAT3:
       {
-         auto valueFP = uniformFloatP.find(it->first);
-         CHECKD3D(glUniformMatrix3fv(currentUniform.location, 1, GL_FALSE, ((valueFP != uniformFloatP.end()) && valueFP->second.data) ? valueFP->second.data : zeroData));
+          if (!fv)
+          {
+              auto valueFP = uniformFloatP.find(it->first);
+              if (valueFP != uniformFloatP.end())
+              {
+                  fv = it->second.m_fvct_value = &valueFP->second;
+              }
+          }
+          if (fv)
+          {
+              CHECKD3D(glUniformMatrix3fv(currentUniform.location, 1, GL_FALSE, ((floatP*)(fv))->data));
+          }
+          else
+          {
+              CHECKD3D(glUniformMatrix3fv(currentUniform.location, 1, GL_FALSE, zeroData));
+          }
       }
       break;
       case GL_FLOAT_MAT4:
       {
-         auto valueFP = uniformFloatP.find(it->first);
-         CHECKD3D(glUniformMatrix4fv(currentUniform.location, 1, GL_FALSE, ((valueFP != uniformFloatP.end()) && valueFP->second.data) ? valueFP->second.data : zeroData));
+          if (!fv)
+          {
+              auto valueFP = uniformFloatP.find(it->first);
+              if (valueFP != uniformFloatP.end())
+              {
+                  fv = it->second.m_fvct_value = &valueFP->second;
+              }
+          }
+          if (fv)
+          {
+              CHECKD3D(glUniformMatrix4fv(currentUniform.location, 1, GL_FALSE, ((floatP*)(fv))->data));
+          }
+          else
+          {
+              CHECKD3D(glUniformMatrix4fv(currentUniform.location, 1, GL_FALSE, zeroData));
+          }
       }
       break;
       case GL_FLOAT_MAT4x3:
       {
-         auto valueFP = uniformFloatP.find(it->first);
-         CHECKD3D(glUniformMatrix4x3fv(currentUniform.location, 1, GL_FALSE, ((valueFP != uniformFloatP.end()) && valueFP->second.data) ? valueFP->second.data : zeroData));
+          if (!fv)
+          {
+              auto valueFP = uniformFloatP.find(it->first);
+              if (valueFP != uniformFloatP.end())
+              {
+                  fv = it->second.m_fvct_value = &valueFP->second;
+              }
+          }
+          if (fv)
+          {
+              CHECKD3D(glUniformMatrix4x3fv(currentUniform.location, 1, GL_FALSE, ((floatP*)(fv))->data));
+          }
+          else
+          {
+              CHECKD3D(glUniformMatrix4x3fv(currentUniform.location, 1, GL_FALSE, zeroData));
+          }
       }
       break;
       case GL_FLOAT_MAT4x2:
       {
-         auto valueFP = uniformFloatP.find(it->first);
-         CHECKD3D(glUniformMatrix4x2fv(currentUniform.location, 1, GL_FALSE, ((valueFP != uniformFloatP.end()) && valueFP->second.data) ? valueFP->second.data : zeroData));
+          if (!fv)
+          {
+              auto valueFP = uniformFloatP.find(it->first);
+              if (valueFP != uniformFloatP.end())
+              {
+                  fv = it->second.m_fvct_value = &valueFP->second;
+              }
+          }
+          if (fv)
+          {
+              CHECKD3D(glUniformMatrix4x2fv(currentUniform.location, 1, GL_FALSE, ((floatP*)(fv))->data));
+          }
+          else
+          {
+              CHECKD3D(glUniformMatrix4x2fv(currentUniform.location, 1, GL_FALSE, zeroData));
+          }
       }
       break;
       case GL_FLOAT_MAT3x4:
       {
-         auto valueFP = uniformFloatP.find(it->first);
-         CHECKD3D(glUniformMatrix3x4fv(currentUniform.location, 1, GL_FALSE, ((valueFP != uniformFloatP.end()) && valueFP->second.data) ? valueFP->second.data : zeroData));
+          if (!fv)
+          {
+              auto valueFP = uniformFloatP.find(it->first);
+              if (valueFP != uniformFloatP.end())
+              {
+                  fv = it->second.m_fvct_value = &valueFP->second;
+              }
+          }
+          if (fv)
+          {
+              CHECKD3D(glUniformMatrix3x4fv(currentUniform.location, 1, GL_FALSE, ((floatP*)(fv))->data));
+          }
+          else
+          {
+              CHECKD3D(glUniformMatrix3x4fv(currentUniform.location, 1, GL_FALSE, zeroData));
+          }
       }
       break;
       case GL_FLOAT_MAT2x4:
       {
-         auto valueFP = uniformFloatP.find(it->first);
-         CHECKD3D(glUniformMatrix2x4fv(currentUniform.location, 1, GL_FALSE, ((valueFP != uniformFloatP.end()) && valueFP->second.data) ? valueFP->second.data : zeroData));
+          if (!fv)
+          {
+              auto valueFP = uniformFloatP.find(it->first);
+              if (valueFP != uniformFloatP.end())
+              {
+                  fv = it->second.m_fvct_value = &valueFP->second;
+              }
+          }
+          if (fv)
+          {
+              CHECKD3D(glUniformMatrix2x4fv(currentUniform.location, 1, GL_FALSE, ((floatP*)(fv))->data));
+          }
+          else
+          {
+              CHECKD3D(glUniformMatrix2x4fv(currentUniform.location, 1, GL_FALSE, zeroData));
+          }
       }
       break;
       case GL_FLOAT_MAT3x2:
       {
-         auto valueFP = uniformFloatP.find(it->first);
-         CHECKD3D(glUniformMatrix3x2fv(currentUniform.location, 1, GL_FALSE, ((valueFP != uniformFloatP.end()) && valueFP->second.data) ? valueFP->second.data : zeroData));
+          if (!fv)
+          {
+              auto valueFP = uniformFloatP.find(it->first);
+              if (valueFP != uniformFloatP.end())
+              {
+                  fv = it->second.m_fvct_value = &valueFP->second;
+              }
+          }
+          if (fv)
+          {
+              CHECKD3D(glUniformMatrix3x2fv(currentUniform.location, 1, GL_FALSE, ((floatP*)(fv))->data));
+          }
+          else
+          {
+              CHECKD3D(glUniformMatrix3x2fv(currentUniform.location, 1, GL_FALSE, zeroData));
+          }
       }
       break;
       case GL_FLOAT_MAT2x3:
       {
-         auto valueFP = uniformFloatP.find(it->first);
-         CHECKD3D(glUniformMatrix2x3fv(currentUniform.location, 1, GL_FALSE, ((valueFP != uniformFloatP.end()) && valueFP->second.data) ? valueFP->second.data : zeroData));
+          if (!fv)
+          {
+              auto valueFP = uniformFloatP.find(it->first);
+              if (valueFP != uniformFloatP.end())
+              {
+                  fv = it->second.m_fvct_value = &valueFP->second;
+              }
+          }
+          if (fv)
+          {
+              CHECKD3D(glUniformMatrix2x3fv(currentUniform.location, 1, GL_FALSE, ((floatP*)(fv))->data));
+          }
+          else
+          {
+              CHECKD3D(glUniformMatrix2x3fv(currentUniform.location, 1, GL_FALSE, zeroData));
+          }
       }
       break;
       case GL_SAMPLER_2D_MULTISAMPLE:
@@ -751,7 +944,7 @@ void Shader::setTextureDirty(int TextureID) {//Invalidate cache
 void Shader::End()
 {
    //Nothing to do for GL
-   CHECKD3D();
+ 
 }
 
 void Shader::SetTextureDepth(const D3DXHANDLE texelName, D3DTexture *texel) {
@@ -884,6 +1077,7 @@ void Shader::SetMatrix(const D3DXHANDLE hParameter, const Matrix3D* pMatrix)
    if ((element == uniformFloatP.end()) || (element->second.data == NULL)) {
       elem.data = (float*)malloc(16 * sizeof(float));
       elem.len = 16;
+      uniformFloatP[hParameter] = elem;
    }
    else if (element->second.len < 16) {
       free(element->second.data);
@@ -893,7 +1087,7 @@ void Shader::SetMatrix(const D3DXHANDLE hParameter, const Matrix3D* pMatrix)
    else
       elem = element->second;
    memcpy(elem.data, pMatrix, 16 * sizeof(float));
-   uniformFloatP[hParameter] = elem;
+   
    if (m_currentTechnique && lastShaderProgram == m_currentTechnique->program) {
       auto location = m_currentTechnique->uniformLocation->find(hParameter);
       if (location == m_currentTechnique->uniformLocation->end()) return;
@@ -936,18 +1130,19 @@ void Shader::SetVector(const D3DXHANDLE hParameter, const vec4* pVector)
    if ((element == uniformFloatP.end()) || (element->second.data == NULL)) {
       elem.data = (float*)malloc(4 * sizeof(float));
       elem.len = 4;
+      uniformFloatP[hParameter] = elem;
    }
    else if (element->second.len < 4) {
       free(element->second.data);
       elem.data = (float*)malloc(4 * sizeof(float));
-      elem.len = 4;
+      elem.len = 4;   
    }
    else {
       elem = element->second;
       if (elem.data[0] == pVector->x && elem.data[1] == pVector->y && elem.data[2] == pVector->z && elem.data[3] == pVector->w) return;
    }
    memcpy(elem.data, pVector, 4 * sizeof(float));
-   uniformFloatP[hParameter] = elem;
+   
    if (m_currentTechnique && lastShaderProgram == m_currentTechnique->program) {
       auto location = m_currentTechnique->uniformLocation->find(hParameter);
       if (location == m_currentTechnique->uniformLocation->end()) return;
@@ -972,6 +1167,7 @@ void Shader::SetVector(const D3DXHANDLE hParameter, const float x, const float y
    if ((element == uniformFloatP.end()) || (element->second.data == NULL)) {
       elem.data = (float*)malloc(4 * sizeof(float));
       elem.len = 4;
+      uniformFloatP[hParameter] = elem;
    }
    else if (element->second.len < 4) {
       free(element->second.data);
@@ -986,7 +1182,7 @@ void Shader::SetVector(const D3DXHANDLE hParameter, const float x, const float y
    elem.data[1] = y;
    elem.data[2] = z;
    elem.data[3] = w;
-   uniformFloatP[hParameter] = elem;
+  
    if (m_currentTechnique && lastShaderProgram == m_currentTechnique->program) {
       auto location = m_currentTechnique->uniformLocation->find(hParameter);
       if (location == m_currentTechnique->uniformLocation->end()) return;
@@ -1028,14 +1224,19 @@ void Shader::SetInt(const D3DXHANDLE hParameter, const int i)
 
 void Shader::SetBool(const D3DXHANDLE hParameter, const bool b)
 {
-   int i = b ? 1 : 0;
-   if (uniformInt[hParameter] == i) return;
-   uniformInt[hParameter] = i;
-   if (m_currentTechnique && lastShaderProgram == m_currentTechnique->program) {
-      auto location = m_currentTechnique->uniformLocation->find(hParameter);
-      if (location == m_currentTechnique->uniformLocation->end()) return;
-      CHECKD3D(glUniform1i(location->second.location, i));
-   }
+    int i = b ? 1 : 0;
+    auto element = uniformInt.find(hParameter);
+    if (element == uniformInt.end())
+    {
+        uniformInt[hParameter] = i;
+    }
+    else if (element->second == i)
+        return;
+    if (m_currentTechnique && lastShaderProgram == m_currentTechnique->program) {
+        auto location = m_currentTechnique->uniformLocation->find(hParameter);
+        if (location == m_currentTechnique->uniformLocation->end()) return;
+        CHECKD3D(glUniform1i(location->second.location, i));
+    }
 }
 
 void Shader::SetFloatArray(const D3DXHANDLE hParameter, const float* pData, const unsigned int count)

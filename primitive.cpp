@@ -1208,7 +1208,7 @@ void Primitive::RenderObject()
       pd3dDevice->basicShader->SetDisableLighting(tmp);
 	  Texture * const nMap = m_ptable->GetImage(m_d.m_szNormalMap);
 
-	  if (g_pplayer->m_texPUP && stricmp(m_d.m_szImage, "backglassimage")==0)
+	  if (g_pplayer->m_texPUP && _stricmp(m_d.m_szImage, "backglassimage")==0)
 	  {
 		  pd3dDevice->basicShader->SetTechnique("basic_with_texture");
 		  pd3dDevice->basicShader->SetTexture("Texture0", pd3dDevice->m_texMan.LoadTexture(g_pplayer->m_texPUP, true), false);

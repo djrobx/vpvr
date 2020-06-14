@@ -85,7 +85,7 @@ void Shader::SetMaterial(const Material * const mat)
       fThickness != currentMaterial.m_fThickness)
    {
       const vec4 rwem(fRoughness, fWrapLighting, fEdge, fThickness);
-      SetVector("Roughness_WrapL_Edge_Thickness", &rwem);
+      SetVectorFast("Roughness_WrapL_Edge_Thickness", &rwem, &m_fvct_Roughness_WrapL_Edge_Thickness);
       currentMaterial.m_fRoughness = fRoughness;
       currentMaterial.m_fWrapLighting = fWrapLighting;
       currentMaterial.m_fEdge = fEdge;
@@ -96,7 +96,7 @@ void Shader::SetMaterial(const Material * const mat)
    if (cBase != currentMaterial.m_cBase || alpha != currentMaterial.m_fOpacity)
    {
       const vec4 cBaseF = convertColor(cBase, alpha);
-      SetVector("cBase_Alpha", &cBaseF);
+      SetVectorFast("cBase_Alpha", &cBaseF, &m_fvct_cBase_Alpha);
       currentMaterial.m_cBase = cBase;
       currentMaterial.m_fOpacity = alpha;
    }
@@ -106,7 +106,7 @@ void Shader::SetMaterial(const Material * const mat)
          fGlossyImageLerp != currentMaterial.m_fGlossyImageLerp)
       {
          const vec4 cGlossyF = convertColor(cGlossy, fGlossyImageLerp);
-         SetVector("cGlossy_ImageLerp", &cGlossyF);
+         SetVectorFast("cGlossy_ImageLerp", &cGlossyF, &m_fvct_cGlossy_ImageLerp);
          currentMaterial.m_cGlossy = cGlossy;
          currentMaterial.m_fGlossyImageLerp = fGlossyImageLerp;
       }
@@ -115,7 +115,7 @@ void Shader::SetMaterial(const Material * const mat)
       (bOpacityActive && fEdgeAlpha != currentMaterial.m_fEdgeAlpha))
    {
       const vec4 cClearcoatF = convertColor(cClearcoat, fEdgeAlpha);
-      SetVector("cClearcoat_EdgeAlpha", &cClearcoatF);
+      SetVectorFast("cClearcoat_EdgeAlpha", &cClearcoatF, &m_fvct_cClearcoat_EdgeAlpha);
       currentMaterial.m_cClearcoat = cClearcoat;
       currentMaterial.m_fEdgeAlpha = fEdgeAlpha;
    }
@@ -134,7 +134,7 @@ void Shader::SetDisableLighting(const float value) // only set top
       currentDisableLighting.y = 0.f;
       currentDisableLighting.z = 0.f;
       currentDisableLighting.w = 0.f;
-      SetVector("fDisableLighting_top_below", &currentDisableLighting);
+      SetVectorFast("fDisableLighting_top_below", &currentDisableLighting, &m_fvct_fDisableLighting_top_below);
    }
 }
 void Shader::SetDisableLighting(const vec4& value) // set top and below
@@ -142,7 +142,7 @@ void Shader::SetDisableLighting(const vec4& value) // set top and below
    if (currentDisableLighting.x != value.x || currentDisableLighting.y != value.y)
    {
       currentDisableLighting = value;
-      SetVector("fDisableLighting_top_below", &value);
+      SetVectorFast("fDisableLighting_top_below", &currentDisableLighting, &m_fvct_fDisableLighting_top_below);
    }
 }
 
@@ -160,7 +160,7 @@ void Shader::SetFlasherColorAlpha(const vec4& color)
    if (currentFlasherColor.x != color.x || currentFlasherColor.y != color.y || currentFlasherColor.z != color.z || currentFlasherColor.w != color.w)
    {
       currentFlasherColor = color;
-      SetVector("staticColor_Alpha", &color);
+      SetVectorFast("staticColor_Alpha", &color, &m_fvct_staticColor_Alpha);
    }
 }
 
@@ -169,7 +169,7 @@ void Shader::SetFlasherData(const vec4& color, const float mode)
    if (currentFlasherData.x != color.x || currentFlasherData.y != color.y || currentFlasherData.z != color.z || currentFlasherData.w != color.w)
    {
       currentFlasherData = color;
-      SetVector("alphaTestValueAB_filterMode_addBlend", &color);
+      SetVectorFast("alphaTestValueAB_filterMode_addBlend", &color, &m_fvct_alphaTestValueAB_filterMode_addBlend);
    }
    if (currentFlasherMode != mode)
    {
@@ -183,7 +183,7 @@ void Shader::SetLightColorIntensity(const vec4& color)
    if (currentLightColor.x != color.x || currentLightColor.y != color.y || currentLightColor.z != color.z || currentLightColor.w != color.w)
    {
       currentLightColor = color;
-      SetVector("lightColor_intensity", &color);
+      SetVectorFast("lightColor_intensity", &color, &m_fvct_lightColor_intensity);
    }
 }
 
@@ -192,7 +192,7 @@ void Shader::SetLightColor2FalloffPower(const vec4& color)
    if (currentLightColor2.x != color.x || currentLightColor2.y != color.y || currentLightColor2.z != color.z || currentLightColor2.w != color.w)
    {
       currentLightColor2 = color;
-      SetVector("lightColor2_falloff_power", &color);
+      SetVectorFast("lightColor2_falloff_power", &color, &m_fvct_lightColor2_falloff_power);
    }
 }
 
@@ -201,7 +201,7 @@ void Shader::SetLightData(const vec4& color)
    if (currentLightData.x != color.x || currentLightData.y != color.y || currentLightData.z != color.z || currentLightData.w != color.w)
    {
       currentLightData = color;
-      SetVector("lightCenter_maxRange", &color);
+      SetVectorFast("lightCenter_maxRange", &color, &m_fvct_lightCenter_maxRange);
    }
 }
 

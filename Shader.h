@@ -4,9 +4,9 @@
 #include <map>
 #include <string>
 
-// Attempt to speed up STL which is very CPU costly, maybe we should look into using EASTL instead? http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2007/n2271.html https://github.com/electronicarts/EASTL
-#define _SECURE_SCL 0
-#define _HAS_ITERATOR_DEBUGGING 0
+
+
+
 
 typedef char* D3DXHANDLE;
 typedef void ID3DXEffect;
@@ -18,6 +18,47 @@ public:
    ~Shader();
 
 #ifdef ENABLE_SDL
+   void* m_fvct_lightCenter_maxRange = NULL;
+   void* m_fvct_Roughness_WrapL_Edge_Thickness = NULL;
+   void* m_fvct_cBase_Alpha = NULL;
+    void* m_fvct_cGlossy_ImageLerp = NULL;
+    void* m_fvct_cClearcoat_EdgeAlpha = NULL;
+    void* m_fvct_fDisableLighting_top_below = NULL;
+    void* m_fvct_staticColor_Alpha = NULL;
+    void* m_fvct_alphaTestValueAB_filterMode_addBlend = NULL;
+    void* m_fvct_lightColor_intensity = NULL;
+    void* m_fvct_lightColor2_falloff_power = NULL;
+
+    inline void SetVectorFast(const D3DXHANDLE hParameter, const vec4* pVector, void** elem)
+    {
+        if (*elem == NULL)
+        {
+            SetVector(hParameter, pVector);
+            auto element = uniformFloatP.find(hParameter);
+            assert(element != uniformFloatP.end() && element->second.data != NULL);
+            *elem = &element->second;
+        }
+        else
+        {
+            memcpy((*(floatP**)elem)->data, pVector, 4 * sizeof(float));
+            if (m_currentTechnique && lastShaderProgram == m_currentTechnique->program) {
+                auto location = m_currentTechnique->uniformLocation->find(hParameter);
+                if (location == m_currentTechnique->uniformLocation->end()) return;
+                switch (location->second.type) {
+                case GL_FLOAT_VEC2:
+                    CHECKD3D(glUniform2fv(location->second.location, 1, (*(floatP**)elem)->data));
+                    break;
+                case GL_FLOAT_VEC3:
+                    CHECKD3D(glUniform3fv(location->second.location, 1, (*(floatP**)elem)->data));
+                    break;
+                case GL_FLOAT_VEC4:
+                    CHECKD3D(glUniform4fv(location->second.location, 1, (*(floatP**)elem)->data));
+                    break;
+                }
+            }
+        }
+    }
+
    bool Load(const char* shaderCodeName, UINT codeSize);
 #else
    bool Load(const BYTE* shaderCodeName, UINT codeSize);
@@ -98,6 +139,7 @@ private:
       int location;
       int size;
       GLuint blockBuffer;
+      void* m_fvct_value = NULL;
    };
    struct glShader {
       int program;

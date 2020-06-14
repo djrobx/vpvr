@@ -76,7 +76,10 @@ void captureThread()
 				g_pplayer->m_pin3d.m_pd3dPrimaryDevice->m_texMan.SetDirty(g_pplayer->m_texPUP);
 		}
 		std::unique_lock<std::mutex> lck(mtx);
+		
 		cv.wait(lck);
+		Sleep(16);
+	
 	}
 }
 
