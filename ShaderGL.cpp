@@ -1230,8 +1230,12 @@ void Shader::SetBool(const D3DXHANDLE hParameter, const bool b)
     {
         uniformInt[hParameter] = i;
     }
-    else if (element->second == i)
-        return;
+    else 
+    {
+    	if (element->second == i)
+          return;
+        element->second = i;
+    }
     if (m_currentTechnique && lastShaderProgram == m_currentTechnique->program) {
         auto location = m_currentTechnique->uniformLocation->find(hParameter);
         if (location == m_currentTechnique->uniformLocation->end()) return;
