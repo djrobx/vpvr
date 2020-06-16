@@ -11,7 +11,7 @@ const int rgwindowsize[] = { 640, 720, 800, 912, 1024, 1152, 1280, 1600 };  // w
 const float AAfactors[] = { 0.5f, 0.75f, 1.0f, 1.25f, 4.0f / 3.0f, 1.5f, 1.75f, 2.0f }; // factor is applied to width and to height, so 2.0f increases pixel count by 4. Additional values can be added.
 const int AAfactorCount = 8;
 
-const int MSAASamplesOpts[] = { 1, 2, 3, 4 };
+const int MSAASamplesOpts[] = { 1, 4, 6, 8 };
 const int MSAASampleCount = 4;
 
 static bool oldScaleValue = false;
@@ -219,14 +219,14 @@ BOOL VROptionsDialog::OnInitDialog()
    SetDlgItemText(IDC_SSSLIDER_LABEL, SSText);
 
    const int MSAASamples = LoadValueIntWithDefault("PlayerVR", "MSAASamples", 4);
-   auto CurrMSAAPos = std::find(MSAASamplesOpts, MSAASamplesOpts + (sizeof(MSAASamplesOpts)/ sizeof(MSAASamplesOpts[0])), MSAASamples);
+   auto CurrMSAAPos = std::find(MSAASamplesOpts, MSAASamplesOpts + (sizeof(MSAASamplesOpts) / sizeof(MSAASamplesOpts[0])), MSAASamples);
    const HWND hwndMSAASlider = GetDlgItem(IDC_MSAASLIDER).GetHwnd();
    SendMessage(hwndMSAASlider, TBM_SETRANGE, fTrue, MAKELONG(0, MSAASampleCount - 1));
    SendMessage(hwndMSAASlider, TBM_SETTICFREQ, 1, 0);
    SendMessage(hwndMSAASlider, TBM_SETLINESIZE, 0, 1);
    SendMessage(hwndMSAASlider, TBM_SETPAGESIZE, 0, 1);
    SendMessage(hwndMSAASlider, TBM_SETTHUMBLENGTH, 5, 0);
-   SendMessage(hwndMSAASlider, TBM_SETPOS, TRUE, (LPARAM) *CurrMSAAPos - 1);
+   SendMessage(hwndMSAASlider, TBM_SETPOS, TRUE, (LPARAM) std::distance(MSAASamplesOpts, CurrMSAAPos));
    char MSAAText[52];
    if (MSAASamples == 1)
    {
@@ -507,7 +507,7 @@ INT_PTR VROptionsDialog::DialogProc(UINT uMsg, WPARAM wParam, LPARAM lParam)
       }
       else if ((HWND)lParam == GetDlgItem(IDC_MSAASLIDER).GetHwnd()) {
          const size_t posMSAA = SendMessage(GetDlgItem(IDC_MSAASLIDER).GetHwnd(), TBM_GETPOS, 0, 0);//Reading the value from wParam does not work reliable
-         const int MSAASampleAmount = ((posMSAA) < MSAASampleCount) ? MSAASamplesOpts[posMSAA] : 4;
+         const int MSAASampleAmount = MSAASamplesOpts[posMSAA];
          char newText[52];
          if (MSAASampleAmount == 1)
          {
