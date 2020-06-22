@@ -1206,7 +1206,8 @@ void Primitive::RenderObject()
 
       const vec4 tmp(m_d.m_fDisableLightingTop, m_d.m_fDisableLightingBelow, 0.f, 0.f);
       pd3dDevice->basicShader->SetDisableLighting(tmp);
-	  Texture * const nMap = m_ptable->GetImage(m_d.m_szNormalMap);
+
+	   Texture * const nMap = m_ptable->GetImage(m_d.m_szNormalMap);
 
 	  if (g_pplayer->m_texPUP && _stricmp(m_d.m_szImage, "backglassimage")==0)
 	  {
@@ -1277,7 +1278,11 @@ void Primitive::RenderObject()
       pd3dDevice->SetTextureAddressMode(0, RenderDevice::TEX_CLAMP);
       //g_pplayer->m_pin3d.DisableAlphaBlend(); //!! not necessary anymore
 
-      pd3dDevice->basicShader->SetDisableLighting(vec4(0.f, 0.f, 0.f, 0.f));
+      if (m_d.m_fDisableLightingTop != 0.f || m_d.m_fDisableLightingBelow != 0.f)
+      {
+         const vec4 tmp(0.f, 0.f, 0.f, 0.f);
+         pd3dDevice->basicShader->SetDisableLighting(tmp);
+      }
    }
    else // m_d.m_useAsPlayfield == true:
    {
@@ -1294,6 +1299,12 @@ void Primitive::RenderObject()
       pd3dDevice->basicShader->End();
       // reset transform
       g_pplayer->UpdateBasicShaderMatrix();
+
+      if (m_d.m_fDisableLightingTop != 0.f || m_d.m_fDisableLightingBelow != 0.f)
+      {
+         const vec4 tmp(0.f, 0.f, 0.f, 0.f);
+         pd3dDevice->basicShader->SetDisableLighting(tmp);
+      }
    }
 }
 
