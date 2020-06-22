@@ -3342,8 +3342,6 @@ void Player::RenderDynamics()
 
    UpdateBallShaderMatrix();
 
-   DrawBulbLightBuffer(); // Move Bulb Light Drawing first so that all objects get the correct bulb texture.
-
    m_pin3d.RenderPlayfieldGraphics(false); // Render the playfield mesh/texture
 
    if (reflection_path != 0)
@@ -3407,6 +3405,8 @@ void Player::RenderDynamics()
       if (ProfilingMode() == 1)
          m_pin3d.m_gpu_profiler.Timestamp(GTS_LightBuffer);
 #endif
+      DrawBulbLightBuffer();
+
       m_dmdstate = 0;
       // Draw transparent objects. No DMD's
       for (size_t i = 0; i < m_vHitTrans.size(); ++i)
