@@ -29,8 +29,10 @@ Pin3D::Pin3D()
 
 Pin3D::~Pin3D()
 {
+#ifndef ENABLE_SDL
 #ifdef FPS
    m_gpu_profiler.Shutdown();
+#endif
 #endif
    m_pd3dPrimaryDevice->UnSetZBuffer();
    m_pd3dPrimaryDevice->FreeShader();

@@ -124,7 +124,9 @@ public:
    D3DTexture* m_pdds3DZBuffer;
 
 #ifdef FPS
+#ifndef ENABLE_SDL
    CGpuProfiler m_gpu_profiler;
+#endif
 #endif
    void* m_pddsZBuffer; // D3DTexture* or RenderTarget*, depending on HW support
 

@@ -842,8 +842,9 @@ void Player::ToggleFPS()
 {
 #ifdef FPS
    ++m_showFPS;
-
+#ifndef ENABLE_SDL
    m_pin3d.m_gpu_profiler.Shutdown(); // Kill it so that it cannot influence standard rendering performance (and otherwise if just switching profile modes to not falsify counters and query info)
+#endif
 #endif
 }
 
@@ -1274,6 +1275,7 @@ void Player::DebugPrint(int x, int y, LPCSTR text, int stringLen, bool shadow)
          {
             SetRect(&fontRect, x + ((i == 0) ? -1 : (i == 1) ? 1 : 0), y + ((i == 2) ? -1 : (i == 3) ? 1 : 0), 0, 0);
 #ifdef ENABLE_SDL
+            //m_pFont->DrawText(NULL, text, -1, &fontRect, DT_NOCLIP, 0xFF000000);
             //TODO Render font
 #else
             m_pFont->DrawText(NULL, text, -1, &fontRect, DT_NOCLIP, 0xFF000000);
@@ -3374,12 +3376,15 @@ void Player::RenderDynamics()
       }
    }
 
+#ifndef ENABLE_SDL
+
 #ifdef FPS
    if (ProfilingMode() == 1)
       m_pin3d.m_gpu_profiler.Timestamp(GTS_PlayfieldGraphics);
 
    if (ProfilingMode() != 2) // normal rendering path for standard gameplay
    {
+#endif
 #endif
       m_dmdstate = 0;
       // Draw non-transparent objects. No DMD's
@@ -3395,6 +3400,7 @@ void Player::RenderDynamics()
 
       DrawBalls();
 
+#ifndef ENABLE_SDL
 #ifdef FPS
       if (ProfilingMode() == 1)
          m_pin3d.m_gpu_profiler.Timestamp(GTS_NonTransparent);
@@ -3407,6 +3413,7 @@ void Player::RenderDynamics()
 #endif
       DrawBulbLightBuffer();
 
+#endif
       m_dmdstate = 0;
       // Draw transparent objects. No DMD's
       for (size_t i = 0; i < m_vHitTrans.size(); ++i)
@@ -3419,6 +3426,8 @@ void Player::RenderDynamics()
          if (m_vHitNonTrans[i]->IsDMD())
             m_vHitNonTrans[i]->RenderDynamic();
 
+
+#ifndef ENABLE_SDL
 #ifdef FPS
       if (ProfilingMode() == 1)
          m_pin3d.m_gpu_profiler.Timestamp(GTS_Transparent);
@@ -3499,6 +3508,7 @@ void Player::RenderDynamics()
       m_pin3d.m_gpu_profiler.Timestamp(GTS_UNUSED); //!!
 #endif
    }
+#endif
 #endif
    m_dmdstate = 0;
 
@@ -3777,7 +3787,6 @@ void Player::RenderStereo(int stereo3D, bool shaderAA) {
       CHECKD3D(error = vr::VRCompositor()->Submit(vr::Eye_Left, &leftEyeTexture));
       vr::Texture_t rightEyeTexture = { (void *)rightTexture->texture, vr::TextureType_OpenGL, vr::ColorSpace_Gamma };
       CHECKD3D(error = vr::VRCompositor()->Submit(vr::Eye_Right, &rightEyeTexture));
-      CHECKD3D(vr::VRCompositor()->PostPresentHandoff());
    }
 #endif
    return;
@@ -3913,6 +3922,8 @@ void Player::UpdateHUD()
       DebugPrint(10, 260, szFoo, len);
    }
 
+#ifndef ENABLE_SDL
+
    // Draw performance readout - at end of CPU frame, so hopefully the previous frame
    //  (whose data we're getting) will have finished on the GPU by now.
    if (ProfilingMode() != 0)
@@ -3949,6 +3960,7 @@ void Player::UpdateHUD()
       }
    }
 #endif /*FPS*/
+#endif
 
    if (m_fFullScreen && m_fCloseDown && !IsWindows10_1803orAbove()) // cannot use dialog boxes in exclusive fullscreen on older windows versions, so necessary
    {
@@ -4058,16 +4070,20 @@ void Player::PostProcess(const bool ambientOcclusion)
    if (m_ptable->m_bloom_strength > 0.0f && !m_bloomOff)
       Bloom(m_ScreenOffset.x, m_ScreenOffset.y, (float)inv_width, (float)inv_height);
 
+#ifndef ENABLE_SDL
 #ifdef FPS
    if (ProfilingMode() == 1)
       m_pin3d.m_gpu_profiler.Timestamp(GTS_Bloom);
 #endif
+#endif
    if (ss_refl)
       SSRefl();
 
+#ifndef ENABLE_SDL
 #ifdef FPS
    if (ProfilingMode() == 1)
       m_pin3d.m_gpu_profiler.Timestamp(GTS_SSR);
+#endif
 #endif
 
    if (ambientOcclusion) {
@@ -4094,9 +4110,11 @@ void Player::PostProcess(const bool ambientOcclusion)
       m_pin3d.m_pd3dPrimaryDevice->FBShader->Begin(0);
       m_pin3d.m_pd3dPrimaryDevice->DrawTexturedQuadPostProcess();
       m_pin3d.m_pd3dPrimaryDevice->FBShader->End();
+#ifndef ENABLE_SDL
 #ifdef FPS
       if (ProfilingMode() == 1)
          m_pin3d.m_gpu_profiler.Timestamp(GTS_AO);
+#endif
 #endif
       // flip AO buffers (avoids copy)
       D3DTexture *tmpAO = m_pin3d.m_pddsAOBackBuffer;
@@ -4153,9 +4171,11 @@ void Player::PostProcess(const bool ambientOcclusion)
    if (m_stereo3D != STEREO_OFF)
       RenderStereo(m_stereo3D, shaderAA);
 
+#ifndef ENABLE_SDL
 #ifdef FPS
    if (ProfilingMode() == 1)
       m_pin3d.m_gpu_profiler.Timestamp(GTS_PostProcess);
+#endif
 #endif
 
    m_pin3d.m_pd3dPrimaryDevice->SetRenderState(RenderDevice::ZENABLE, TRUE);
@@ -4430,9 +4450,11 @@ void Player::Render()
    for (size_t l = 0; l < m_vanimate.size(); ++l)
       m_vanimate[l]->Animate();
 
+#ifndef ENABLE_SDL
 #ifdef FPS
    if (ProfilingMode() == 1)
       m_pin3d.m_gpu_profiler.BeginFrame(m_pin3d.m_pd3dPrimaryDevice->GetCoreDevice());
+#endif
 #endif
 
 #ifdef ENABLE_VR
@@ -4485,9 +4507,11 @@ void Player::Render()
    }
    FlipVideoBuffers(vsync);
 
+#ifndef ENABLE_SDL
 #ifdef FPS
    if (ProfilingMode() != 0)
       m_pin3d.m_gpu_profiler.EndFrame();
+#endif
 #endif
 #ifndef ACCURATETIMERS
    // do the en/disable changes for the timers that piled up
