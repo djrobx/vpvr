@@ -489,7 +489,7 @@ void Surface::AddLine(vector<HitObject*> &pvho, const RenderVertex &pv1, const R
    SetupHitObject(pvho, new HitPoint(Vertex3Ds(pv1.x, pv1.y, top)));
 }
 
-void Surface::GetBoundingVertices(std::vector<Vertex3Ds>& pvvertex3D)
+void Surface::GetBoundingVertices(eastl::vector<Vertex3Ds>& pvvertex3D)
 {
    // hardwired to table dimensions, but with bottom/top of surface, returns all 8 corners as this will be used for further transformations later-on
    for (int i = 0; i < 8; i++)

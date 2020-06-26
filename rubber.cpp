@@ -285,7 +285,7 @@ void Rubber::RenderBlueprint(Sur *psur, const bool solid)
    }
 }
 
-void Rubber::GetBoundingVertices(std::vector<Vertex3Ds>& pvvertex3D)
+void Rubber::GetBoundingVertices(eastl::vector<Vertex3Ds>& pvvertex3D)
 {
    //!! meh, this is delivering something loosely related to the bounding vertices, but its only used in the cam fitting code so far, so keep for legacy reasons
    int cvertex;
