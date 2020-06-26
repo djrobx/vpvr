@@ -3,10 +3,8 @@
 #ifdef ENABLE_SDL
 #include <map>
 #include <string>
-
-
-
-
+#include <EASTL/unordered_map.h>
+#include <EASTL/string.h>
 
 typedef char* D3DXHANDLE;
 typedef void ID3DXEffect;
@@ -143,8 +141,9 @@ private:
    };
    struct glShader {
       int program;
-      std::unordered_map<string, attributeLoc> *attributeLocation;
-      std::unordered_map<string, uniformLoc> *uniformLocation;
+      string codename;
+      eastl::unordered_map<eastl::string, attributeLoc> *attributeLocation;
+      eastl::unordered_map<eastl::string, uniformLoc> *uniformLocation;
    };
    struct floatP {
       size_t len;
@@ -154,11 +153,11 @@ private:
    // for speedup hack..
    floatP ufloatp = { 0, NULL };
 
-   std::unordered_map<string, glShader> shaderList;
-   std::unordered_map<string, float> uniformFloat;
-   std::unordered_map<string, floatP> uniformFloatP;
-   std::unordered_map<string, int> uniformInt;
-   std::unordered_map<string, int> uniformTex;
+   eastl::unordered_map<eastl::string, glShader> shaderList;
+   eastl::unordered_map<eastl::string, float> uniformFloat;
+   eastl::unordered_map<eastl::string, floatP> uniformFloatP;
+   eastl::unordered_map<eastl::string, int> uniformInt;
+   eastl::unordered_map<eastl::string, int> uniformTex;
    char technique[256];
    static Matrix3D mWorld, mView, mProj[2];
    static int lastShaderProgram;

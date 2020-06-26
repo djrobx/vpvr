@@ -1,6 +1,7 @@
 #pragma once
 
 #include <map>
+#include <EASTL/map.h>
 #include "typeDefs3D.h"
 
 #include "Material.h"
@@ -439,7 +440,7 @@ private:
    static const DWORD TEXTURE_STATE_CACHE_SIZE = 256;
    static const DWORD TEXTURE_SAMPLER_CACHE_SIZE = 14;
 
-   std::map<RenderStates, DWORD> renderStateCache;          // for caching
+   eastl::map<RenderStates, DWORD> renderStateCache;          // for caching
    DWORD textureStateCache[8][TEXTURE_STATE_CACHE_SIZE];     // dto.
    DWORD textureSamplerCache[8][TEXTURE_SAMPLER_CACHE_SIZE]; // dto.
 

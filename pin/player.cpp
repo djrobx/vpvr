@@ -1019,7 +1019,7 @@ Vertex3Ds g_viewDir;
 static bool CompareHitableDepth(Hitable* h1, Hitable* h2)
 {
    // GetDepth approximates direction in view distance to camera; sort ascending
-   return h1->GetDepth(g_viewDir) >= h2->GetDepth(g_viewDir);
+   return h1->GetDepth(g_viewDir) > h2->GetDepth(g_viewDir);
 }
 
 static bool CompareHitableDepthInverse(Hitable* h1, Hitable* h2)
@@ -3788,7 +3788,7 @@ void Player::RenderStereo(int stereo3D, bool shaderAA) {
       CHECKD3D(error = vr::VRCompositor()->Submit(vr::Eye_Left, &leftEyeTexture));
       vr::Texture_t rightEyeTexture = { (void *)rightTexture->texture, vr::TextureType_OpenGL, vr::ColorSpace_Gamma };
       CHECKD3D(error = vr::VRCompositor()->Submit(vr::Eye_Right, &rightEyeTexture));
-      //CHECKD3D(vr::VRCompositor()->PostPresentHandoff()); // PostPresentHandoff gives mixed results, improved GPU frametime for some, worse CPU frametime for others
+      CHECKD3D(vr::VRCompositor()->PostPresentHandoff()); // PostPresentHandoff gives mixed results, improved GPU frametime for some, worse CPU frametime for others
    }
 #endif
    return;

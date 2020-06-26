@@ -2371,7 +2371,7 @@ bool RenderDevice::SetRenderStateCache(const RenderStates p1, DWORD p2)
 {
    if (renderStateCache.find(p1) == renderStateCache.end())
    {
-      renderStateCache.insert(std::pair<RenderStates, DWORD>(p1, p2));
+      renderStateCache.insert(eastl::pair<RenderStates, DWORD>(p1, p2));
       return false;
    }
    else if (renderStateCache[p1] != p2) {
@@ -2666,8 +2666,8 @@ void RenderDevice::UpdateVRPosition()
          break;
       }
    }
-   m_matView.Invert();
-   m_matView = m_tableWorld * m_matView;
+      m_matView.Invert();
+      m_matView = m_tableWorld * m_matView;
 #endif
 }
 
@@ -2936,8 +2936,8 @@ D3DTexture* RenderDevice::CreateTexture(UINT Width, UINT Height, UINT Levels, te
 
    }*/
    
-   if (m_maxaniso > 0)
-      CHECKD3D(glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAX_ANISOTROPY_EXT, m_maxaniso));
+   //if (m_maxaniso > 0)
+      //CHECKD3D(glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAX_ANISOTROPY_EXT, m_maxaniso)); // OK need to leave this off for now, creates black artifacts sometimes, example table: Guns N Roses 4K Mod, see the plastic ramps and the bumpers.
 
    CHECKD3D(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR)); // Use mipmap filtering GL_LINEAR_MIPMAP_LINEAR
    CHECKD3D(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR));; // MAG Filter does not support mipmaps

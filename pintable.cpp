@@ -13,6 +13,7 @@
 #include "threadpool.h"
 #include "Shader.h"
 #include "captureExt.h"
+#include <EASTL/vector.h>
 
 using namespace rapidxml;
 
@@ -952,7 +953,7 @@ static inline bool4 ambi_dom(const Vertex4D &jDx)
 
 void upscale(DWORD * const data, const unsigned int xres, const unsigned int yres, const bool is_brightness_data)
 {
-   std::vector<Vertex4D> metric(xres*yres); //!! avoid constant reallocs?
+   eastl::vector<Vertex4D> metric(xres*yres); //!! avoid constant reallocs?
 
    unsigned int o = 0;
    if (is_brightness_data)
@@ -996,10 +997,10 @@ void upscale(DWORD * const data, const unsigned int xres, const unsigned int yre
       }
    }
 
-   std::vector<bool4> g_res(xres*yres); //!! avoid constant reallocs?
-   std::vector<bool4> g_hori(xres*yres);
-   std::vector<bool4> g_vert(xres*yres);
-   std::vector<bool4> g_or(xres*yres);
+   eastl::vector<bool4> g_res(xres*yres); //!! avoid constant reallocs?
+   eastl::vector<bool4> g_hori(xres*yres);
+   eastl::vector<bool4> g_vert(xres*yres);
+   eastl::vector<bool4> g_or(xres*yres);
 
    o = 0;
    for (unsigned int j = 0; j < yres; ++j)
@@ -2158,7 +2159,7 @@ void PinTable::Render3DProjection(Sur * const psur)
    const float inclination = ANGTORAD(m_BG_inclination[m_BG_current_set]);
    const float FOV = (m_BG_FOV[m_BG_current_set] < 1.0f) ? 1.0f : m_BG_FOV[m_BG_current_set]; // Can't have a real zero FOV, but this will look almost the same
 
-   std::vector<Vertex3Ds> vvertex3D;
+   eastl::vector<Vertex3Ds> vvertex3D;
    for (size_t i = 0; i < m_vedit.size(); i++)
       m_vedit[i]->GetBoundingVertices(vvertex3D);
 
@@ -7921,7 +7922,7 @@ Texture* PinTable::GetImage(const char * const szName) const
    // during playback, we use the hashtable for lookup
    if (!m_textureMap.empty())
    {
-      std::unordered_map<const char*, Texture*, StringHashFunctor, StringComparator>::const_iterator
+      eastl::unordered_map<const char*, Texture*, StringHashFunctor, StringComparator>::const_iterator
          it = m_textureMap.find(szName);
       if (it != m_textureMap.end())
          return it->second;
@@ -8304,7 +8305,7 @@ Material* PinTable::GetMaterial(const char * const szName) const
    // during playback, we use the hashtable for lookup
    if (!m_materialMap.empty())
    {
-      std::unordered_map<const char*, Material*, StringHashFunctor, StringComparator>::const_iterator
+      eastl::unordered_map<const char*, Material*, StringHashFunctor, StringComparator>::const_iterator
          it = m_materialMap.find(szName);
       if (it != m_materialMap.end())
          return it->second;
