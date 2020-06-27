@@ -698,7 +698,7 @@ return S_OK;
 STDMETHODIMP ScriptGlobalTable::get_ShowDT(VARIANT_BOOL *pVal)
 {
    if (g_pplayer)
-      *pVal = (VARIANT_BOOL)FTOVB(g_pplayer->m_ptable->m_BG_current_set == BG_DESKTOP || g_pplayer->m_ptable->m_BG_current_set == BG_FSS); // DT & FSS
+      *pVal = (VARIANT_BOOL)FTOVB(g_pplayer->m_ptable->m_BG_current_set == BG_DESKTOP || g_pplayer->m_ptable->m_BG_current_set == BG_FSS || g_pplayer->m_stereo3D==STEREO_VR ); // DT & FSS & VR
    return S_OK;
 }
 
