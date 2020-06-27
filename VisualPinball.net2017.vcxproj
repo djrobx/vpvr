@@ -268,7 +268,7 @@ copy "$(MSBuildProjectDirectory)\dll\*.dll" "%25VPIN_DIR%25"</Command>
     <ClCompile>
       <Optimization>Disabled</Optimization>
       <AdditionalIncludeDirectories>.\;$(DXSDK_DIR)\Include;dialogs;shader;inc;pin;media;inc\win32xx\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>ENABLE_BAM;ENABLE_SDL;USE_DINPUT8;COR_ENABLE_PROFILING;WIN32;_DEBUG;_WINDOWS;MYDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>ENABLE_BAM;ENABLE_SDL;USE_DINPUT8;COR_ENABLE_PROFILING;WIN32;_DEBUG;_WINDOWS;MYDEBUG;FPS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
       <PrecompiledHeader>Use</PrecompiledHeader>
@@ -526,7 +526,7 @@ copy "$(MSBuildProjectDirectory)\dll\*.dll" "%25VPIN_DIR%25"</Command>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
       <AdditionalIncludeDirectories>.\;$(DXSDK_DIR)\Include;dialogs;shader;inc;pin;media;inc\win32xx\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>ENABLE_BAM;ENABLE_SDL;USE_DINPUT8;WIN32;NDEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>ENABLE_BAM;ENABLE_SDL;USE_DINPUT8;WIN32;NDEBUG;_WINDOWS;FPS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
       <ExceptionHandling>Sync</ExceptionHandling>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
@@ -741,6 +741,33 @@ copy "$(MSBuildProjectDirectory)\dll\x64\*.dll" "%25VPIN_DIR%25"</Command>
     <ClCompile Include="Dialogs\TableInfoDialog.cpp" />
     <ClCompile Include="dialogs\VideoOptionsDialog.cpp" />
     <ClCompile Include="dialogs\VROptionsDialog.cpp" />
+    <ClCompile Include="EASTL\allocator_eastl.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release_SDL|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="EASTL\assert.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release_SDL|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="EASTL\fixed_pool.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release_SDL|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="EASTL\hashtable.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release_SDL|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="EASTL\intrusive_list.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release_SDL|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="EASTL\numeric_limits.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release_SDL|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="EASTL\red_black_tree.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release_SDL|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="EASTL\string.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release_SDL|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="EASTL\thread_support.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release_SDL|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
     <ClCompile Include="flasher.cpp" />
     <ClCompile Include="glad.c">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
