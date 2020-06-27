@@ -290,7 +290,7 @@ void Ramp::RenderBlueprint(Sur *psur, const bool solid)
 }
 
 
-void Ramp::GetBoundingVertices(std::vector<Vertex3Ds>& pvvertex3D)
+void Ramp::GetBoundingVertices(eastl::vector<Vertex3Ds>& pvvertex3D)
 {
    //!! meh, this is delivering something loosely related to the bounding vertices, but its only used in the cam fitting code so far, so keep for legacy reasons
    float *rgheight1;
@@ -2390,8 +2390,7 @@ void Ramp::RenderRamp(const Material * const mat)
       pd3dDevice->SetRenderState(RenderDevice::ZWRITEENABLE, RenderDevice::RS_TRUE);
       pd3dDevice->SetRenderStateCulling(RenderDevice::CULL_NONE); // as both floor and walls are thinwalled
 
-      const vec4 tmp(0.f, 1.f, 0.f, 0.f);
-      pd3dDevice->basicShader->SetDisableLighting(tmp);
+      pd3dDevice->basicShader->SetDisableLighting(vec4(0.f, 1.f, 0.f, 0.f));
 
       Pin3D * const ppin3d = &g_pplayer->m_pin3d;
       Texture * const pin = m_ptable->GetImage(m_d.m_szImage);

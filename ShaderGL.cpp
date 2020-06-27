@@ -35,6 +35,16 @@ int* Shader::textureSlotList = NULL;
 std::map<int, int> Shader::slotTextureList;
 int Shader::maxSlots = 0;
 
+void* operator new[](size_t size, const char* pName, int flags, unsigned     debugFlags, const char* file, int line)
+{
+   return new uint8_t[size];
+}
+
+void* operator new[](size_t size, size_t alignment, size_t alignmentOffset, const char* pName, int flags, unsigned debugFlags, const char* file, int line)
+{
+   return new uint8_t[size];
+}
+
 Shader::~Shader()
 {
    shaderCount--;
@@ -91,7 +101,7 @@ void LOG(int level, const char* fileNameRoot, string message) {
 }
 
 //parse a file. Is called recursively for includes
-bool parseFile(const char* fileNameRoot, const char* fileName, int level, std::unordered_map<string, string> &values, string parentMode) {
+bool parseFile(const char* fileNameRoot, const char* fileName, int level, eastl::unordered_map<eastl::string, string> &values, string parentMode) {
    if (level > 16) {//Can be increased, but looks very much like an infinite recursion.
       LOG(1, fileNameRoot, string("Reached more than 16 include while trying to include ").append(fileName).append("levels. Aborting..."));
       return false;
@@ -101,7 +111,7 @@ bool parseFile(const char* fileNameRoot, const char* fileName, int level, std::u
    }
    string line;
    string currentMode = parentMode;
-   std::unordered_map<string, string>::iterator currentElemIt = values.find(parentMode);
+   eastl::unordered_map<eastl::string, string>::iterator currentElemIt = values.find(parentMode.c_str());
    string currentElement = (currentElemIt != values.end()) ? currentElemIt->second : "";
    std::ifstream glfxFile;
    glfxFile.open(string(Shader::shaderPath).append(fileName), std::ifstream::in);
@@ -116,8 +126,8 @@ bool parseFile(const char* fileNameRoot, const char* fileName, int level, std::u
             if (newMode.compare("DEFINES") == 0) {
                currentElement.append(Shader::Defines).append("\n");
             } else if (newMode.compare(currentMode) != 0) {
-               values[currentMode] = currentElement;
-               currentElemIt = values.find(newMode);
+               values[currentMode.c_str()] = currentElement;
+               currentElemIt = values.find(newMode.c_str());
                currentElement = (currentElemIt != values.end()) ? currentElemIt->second : "";
                currentMode = newMode;
             }
@@ -125,17 +135,17 @@ bool parseFile(const char* fileNameRoot, const char* fileName, int level, std::u
          else if (line.compare(0, 9, "#include ") == 0) {
             size_t start = line.find('"', 8);
             size_t end = line.find('"', start + 1);
-            values[currentMode] = currentElement;
+            values[currentMode.c_str()] = currentElement;
             if ((start == string::npos) || (end == string::npos) || (end <= start) || !parseFile(fileNameRoot, line.substr(start + 1, end - start - 1).c_str(), level + 1, values, currentMode)) {
                LOG(1, fileNameRoot, string(fileName).append("(").append(std::to_string(linenumber)).append("):").append(line).append(" failed."));
             }
-            currentElement = values[currentMode];
+            currentElement = values[currentMode.c_str()];
          }
          else {
             currentElement.append(line).append("\n");
          }
       }
-      values[currentMode] = currentElement;
+      values[currentMode.c_str()] = currentElement;
       glfxFile.close();
    }
    else {
@@ -278,7 +288,7 @@ bool Shader::compileGLShader(const char* fileNameRoot, string shaderCodeName, st
 
       CHECKD3D(glGetProgramiv(shaderprogram, GL_ACTIVE_UNIFORMS, &count));
       char uniformName[256];
-      shader.uniformLocation = new std::unordered_map<string, uniformLoc>;
+      shader.uniformLocation = new eastl::unordered_map<eastl::string, uniformLoc>;
       for (int i = 0;i < count;++i) {
          GLenum type;
          int size;
@@ -327,7 +337,7 @@ bool Shader::compileGLShader(const char* fileNameRoot, string shaderCodeName, st
 
       CHECKD3D(glGetProgramiv(shaderprogram, GL_ACTIVE_ATTRIBUTES, &count));
       char attributeName[256];
-      shader.attributeLocation = new std::unordered_map<string, attributeLoc>;
+      shader.attributeLocation = new eastl::unordered_map<eastl::string, attributeLoc>;
       for (int i = 0;i < count;++i) {
          GLenum type;
          int size;
@@ -355,13 +365,14 @@ bool Shader::compileGLShader(const char* fileNameRoot, string shaderCodeName, st
             shader.attributeLocation->operator[](attributeName) = newLoc;
          }
       }
-      shaderList.insert(std::pair<string, glShader>(shaderCodeName, shader));
+      shader.codename = shaderCodeName;
+      shaderList.insert(eastl::pair<const char *, glShader>(shader.codename.c_str(), shader));
    }
    return success;
 }
 
 //Check if technique is valid and replace %PARAMi% with the values in the function header
-string analyzeFunction(const char* shaderCodeName, string technique, string functionName, std::unordered_map<string, string> &values) {
+string analyzeFunction(const char* shaderCodeName, string technique, string functionName, eastl::unordered_map<eastl::string, string> &values) {
    int start, end;
    start = functionName.find("(");
    end = functionName.find(")");
@@ -369,7 +380,7 @@ string analyzeFunction(const char* shaderCodeName, string technique, string func
       LOG(2, (const char*)shaderCodeName, string("Invalid technique: ").append(technique));
       return "";
    }
-   std::unordered_map<string, string>::iterator it = values.find(functionName.substr(0, start));
+   eastl::unordered_map<eastl::string, string>::iterator it = values.find(functionName.substr(0, start).c_str());
    string functionCode = (it != values.end()) ? it->second : "";
    if (end > start + 1) {
       std::stringstream params(functionName.substr(start + 1, end - start - 1));
@@ -393,7 +404,7 @@ bool Shader::Load(const char* shaderCodeName, UINT codeSize)
    }
    m_currentTechnique = NULL;
    LOG(3, (const char*)shaderCodeName, "Start parsing file");
-   std::unordered_map<string, string> values;
+   eastl::unordered_map<eastl::string, string> values;
    bool success = parseFile((const char*)shaderCodeName, (const char*)shaderCodeName, 0, values, "GLOBAL");
    if (!success) {
       LOG(1, (const char*)shaderCodeName, "Parsing failed\n");
@@ -401,7 +412,7 @@ bool Shader::Load(const char* shaderCodeName, UINT codeSize)
    else {
       LOG(3, (const char*)shaderCodeName, "Parsing successful. Start compiling shaders");
    }
-   std::unordered_map<string, string>::iterator it = values.find("GLOBAL");
+   eastl::unordered_map<eastl::string, string>::iterator it = values.find("GLOBAL");
    string global = (it != values.end()) ? it->second : "";
 
    it = values.find("VERTEX");
@@ -499,9 +510,9 @@ void Shader::setAttributeFormat(DWORD fvf)
       CHECKD3D(glEnableVertexAttribArray(currentAttribute.location));
       switch (fvf) {
       case MY_D3DFVF_TEX:
-         if (it->first.compare("vPosition") == 0) offset = 0;
-         else if (it->first.compare("tc") == 0) offset = 12;
-         else if (it->first.compare("tex0") == 0) offset = 12;
+         if (strcmp(it->first.c_str(), "vPosition") == 0) offset = 0;
+         else if (strcmp(it->first.c_str(), "tc") == 0) offset = 12;
+         else if (strcmp(it->first.c_str(), "tex0") == 0) offset = 12;
          else {
             ReportError("unknown Attribute", 666, __FILE__, __LINE__);
             exit(-1);
@@ -510,10 +521,10 @@ void Shader::setAttributeFormat(DWORD fvf)
          break;
       case MY_D3DFVF_NOTEX2_VERTEX:
       case MY_D3DTRANSFORMED_NOTEX2_VERTEX:
-         if (it->first.compare("vPosition") == 0) offset = 0;
-         else if (it->first.compare("vNormal") == 0) offset = 12;
-         else if (it->first.compare("tc") == 0) offset = 24;
-         else if (it->first.compare("tex0") == 0) offset = 24;
+         if (strcmp(it->first.c_str(), "vPosition") == 0) offset = 0;
+         else if (strcmp(it->first.c_str(), "vNormal") == 0) offset = 12;
+         else if (strcmp(it->first.c_str(), "tc") == 0) offset = 24;
+         else if (strcmp(it->first.c_str(), "tex0") == 0) offset = 24;
          else {
             ReportError("unknown Attribute", 666, __FILE__, __LINE__);
             exit(-1);
@@ -927,7 +938,7 @@ void Shader::Begin(const unsigned int pass)
       }
       break;
       default:
-         sprintf_s(msg, 256, "Unknown uniform type 0x%0002X for %s in %s", currentUniform.type, it->first.c_str(), tn);
+         sprintf_s(msg, 256, "Unknown uniform type 0x%0002X for %s in %s", currentUniform.type, it->first, tn);
          ShowError(msg);
       }
    }

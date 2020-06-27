@@ -1,5 +1,7 @@
 #pragma once
 
+#include <EASTL/vector.h>
+
 class HitTimer;
 class Hitable;
 class Collection;
@@ -219,7 +221,7 @@ public:
    virtual IFireEvents *GetIFireEvents() = 0;
    virtual ItemTypeEnum GetItemType() const = 0;
 
-   virtual void GetBoundingVertices(std::vector<Vertex3Ds>& pvvertex3D) {}
+   virtual void GetBoundingVertices(eastl::vector<Vertex3Ds>& pvvertex3D) {}
    virtual void WriteRegDefaults() {}
 
    void BeginUndo();

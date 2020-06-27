@@ -115,7 +115,7 @@ public:
    virtual Vertex2D GetCenter() const { return GetPointCenter(); }
    virtual void PutCenter(const Vertex2D& pv) { PutPointCenter(pv); }
 
-   virtual void GetBoundingVertices(std::vector<Vertex3Ds>& pvvertex3D);
+   virtual void GetBoundingVertices(eastl::vector<Vertex3Ds>& pvvertex3D);
 
    void AssignHeightToControlPoint(const RenderVertex3D &v, const float height);
    virtual bool IsTransparent() const;

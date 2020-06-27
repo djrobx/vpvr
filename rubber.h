@@ -106,7 +106,7 @@ public:
    virtual Vertex2D GetCenter() const { return GetPointCenter(); }
    virtual void PutCenter(const Vertex2D& pv) { PutPointCenter(pv); }
 
-   virtual void GetBoundingVertices(std::vector<Vertex3Ds>& pvvertex3D);
+   virtual void GetBoundingVertices(eastl::vector<Vertex3Ds>& pvvertex3D);
 
    virtual float GetDepth(const Vertex3Ds& viewDir) const;
    virtual unsigned long long GetMaterialID() const { return m_ptable->GetMaterial(m_d.m_szMaterial)->hash(); }
