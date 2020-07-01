@@ -253,7 +253,7 @@ void Surface::UIRenderPass1(Sur * const psur)
    // Don't want border color to be over-ridden when selected - that will be drawn later
    psur->SetBorderColor(-1, false, 0);
 
-   std::vector<RenderVertex> vvertex;
+   eastl::vector<RenderVertex> vvertex;
    GetRgVertex(vvertex);
 
    Texture *ppi;
@@ -279,7 +279,7 @@ void Surface::UIRenderPass2(Sur * const psur)
    psur->SetObject(NULL);
 
    {
-      std::vector<RenderVertex> vvertex; //!! check/reuse from prerender
+      eastl::vector<RenderVertex> vvertex; //!! check/reuse from prerender
       GetRgVertex(vvertex);
       psur->Polygon(vvertex);
    }
@@ -337,7 +337,7 @@ void Surface::RenderBlueprint(Sur *psur, const bool solid)
    psur->SetObject(this); // For selected formatting
    psur->SetObject(NULL);
 
-   std::vector<RenderVertex> vvertex;
+   eastl::vector<RenderVertex> vvertex;
    GetRgVertex(vvertex);
 
    psur->Polygon(vvertex);
@@ -372,7 +372,7 @@ void Surface::GetHitShapesDebug(vector<HitObject*> &pvho)
 
 void Surface::CurvesToShapes(vector<HitObject*> &pvho)
 {
-   std::vector<RenderVertex> vvertex;
+   eastl::vector<RenderVertex> vvertex;
    GetRgVertex(vvertex);
 
    const int count = (int)vvertex.size();
@@ -553,9 +553,9 @@ void Surface::RenderDynamic()
    }
 }
 
-void Surface::GenerateMesh(std::vector<Vertex3D_NoTex2> &topBuf, std::vector<Vertex3D_NoTex2> &sideBuf, std::vector<WORD> &topBottomIndices, std::vector<WORD> &sideIndices)
+void Surface::GenerateMesh(eastl::vector<Vertex3D_NoTex2> &topBuf, eastl::vector<Vertex3D_NoTex2> &sideBuf, eastl::vector<WORD> &topBottomIndices, eastl::vector<WORD> &sideIndices)
 {
-   std::vector<RenderVertex> vvertex;
+   eastl::vector<RenderVertex> vvertex;
    GetRgVertex(vvertex);
    float *rgtexcoord = NULL;
 
@@ -691,7 +691,7 @@ void Surface::GenerateMesh(std::vector<Vertex3D_NoTex2> &topBuf, std::vector<Ver
       topBottomIndices.clear();
 
       {
-         std::vector<unsigned int> vpoly(numVertices);
+         eastl::vector<unsigned int> vpoly(numVertices);
          for (unsigned int i = 0; i < numVertices; i++)
             vpoly[i] = i;
 
@@ -756,10 +756,10 @@ void Surface::ExportMesh(FILE *f)
    m_d.m_heightbottom *= m_ptable->m_BG_scalez[m_ptable->m_BG_current_set];
    m_d.m_heighttop *= m_ptable->m_BG_scalez[m_ptable->m_BG_current_set];
 
-   std::vector<Vertex3D_NoTex2> topBuf;
-   std::vector<Vertex3D_NoTex2> sideBuf;
-   std::vector<WORD> topBottomIndices;
-   std::vector<WORD> sideIndices;
+   eastl::vector<Vertex3D_NoTex2> topBuf;
+   eastl::vector<Vertex3D_NoTex2> sideBuf;
+   eastl::vector<WORD> topBottomIndices;
+   eastl::vector<WORD> sideIndices;
    GenerateMesh(topBuf, sideBuf, topBottomIndices, sideIndices);
 
    m_d.m_heightbottom = oldBottomHeight;
@@ -825,10 +825,10 @@ void Surface::PrepareWallsAtHeight()
    if (VBuffer)
       VBuffer->release();
 
-   std::vector<Vertex3D_NoTex2> topBottomBuf;
-   std::vector<Vertex3D_NoTex2> sideBuf;
-   std::vector<WORD> topBottomIndices;
-   std::vector<WORD> sideIndices;
+   eastl::vector<Vertex3D_NoTex2> topBottomBuf;
+   eastl::vector<Vertex3D_NoTex2> sideBuf;
+   eastl::vector<WORD> topBottomIndices;
+   eastl::vector<WORD> sideIndices;
    GenerateMesh(topBottomBuf, sideBuf, topBottomIndices, sideIndices);
 
    VertexBuffer::CreateVertexBuffer(numVertices * 4 + ((topBottomBuf.size() > 0) ? numVertices * 3 : 0), 0, MY_D3DFVF_NOTEX2_VERTEX, &VBuffer);
@@ -1142,7 +1142,7 @@ void Surface::AddPoint(int x, int y, const bool smooth)
 
    const Vertex2D v = m_ptable->TransformPoint(x, y);
 
-   std::vector<RenderVertex> vvertex;
+   eastl::vector<RenderVertex> vvertex;
    GetRgVertex(vvertex);
 
    Vertex2D vOut;

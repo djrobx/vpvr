@@ -240,7 +240,7 @@ void Light::UIRenderPass1(Sur * const psur)
    {
    default:
    case ShapeCustom:
-      std::vector<RenderVertex> vvertex;
+      eastl::vector<RenderVertex> vvertex;
       GetRgVertex(vvertex);
 
       // Check if we should display the image in the editor.
@@ -304,7 +304,7 @@ void Light::RenderOutline(Sur * const psur)
 
    case ShapeCustom:
    {
-      std::vector<RenderVertex> vvertex;
+      eastl::vector<RenderVertex> vvertex;
       GetRgVertex(vvertex);
       psur->SetBorderColor(RGB(255, 0, 0), false, 0);
       psur->Ellipse(m_d.m_vCenter.x, m_d.m_vCenter.y, m_d.m_falloff /*+ m_d.m_borderwidth*/);
@@ -362,7 +362,7 @@ void Light::GetHitShapesDebug(vector<HitObject*> &pvho)
    }
 
    case ShapeCustom: {
-      std::vector<RenderVertex> vvertex;
+      eastl::vector<RenderVertex> vvertex;
       GetRgVertex(vvertex);
 
       const int cvertex = (int)vvertex.size();
@@ -706,10 +706,10 @@ void Light::PrepareMoversCustom()
       return;
 
    float maxdist = 0.f;
-   std::vector<WORD> vtri;
+   eastl::vector<WORD> vtri;
 
    {
-      std::vector<unsigned int> vpoly(m_vvertex.size());
+      eastl::vector<unsigned int> vpoly(m_vvertex.size());
       const unsigned int cvertex = (unsigned int)m_vvertex.size();
       for (unsigned int i = 0; i < cvertex; i++)
       {
@@ -1157,7 +1157,7 @@ void Light::AddPoint(int x, int y, const bool smooth)
    STARTUNDO
       const Vertex2D v = m_ptable->TransformPoint(x, y);
 
-   std::vector<RenderVertex> vvertex;
+   eastl::vector<RenderVertex> vvertex;
    GetRgVertex(vvertex);
 
    int iSeg;

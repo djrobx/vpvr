@@ -306,7 +306,7 @@ int getNumberOfDisplays()
 #endif
 }
 
-void EnumerateDisplayModes(const int display, std::vector<VideoMode>& modes)
+void EnumerateDisplayModes(const int display, eastl::vector<VideoMode>& modes)
 {
    modes.clear();
 
@@ -348,7 +348,7 @@ void EnumerateDisplayModes(const int display, std::vector<VideoMode>& modes)
       modes.push_back(vmode);
    }
 #else
-   std::vector<DisplayConfig> displays;
+   eastl::vector<DisplayConfig> displays;
    getDisplayList(displays);
    if (display >= displays.size())
       return;
@@ -383,7 +383,7 @@ void EnumerateDisplayModes(const int display, std::vector<VideoMode>& modes)
 #endif
 }
 
-//int getDisplayList(std::vector<DisplayConfig>& displays)
+//int getDisplayList(eastl::vector<DisplayConfig>& displays)
 //{
 //   int maxAdapter = SDL_GetNumVideoDrivers();
 //   int display = 0;
@@ -432,7 +432,7 @@ BOOL CALLBACK MonitorEnumList(__in  HMONITOR hMonitor, __in  HDC hdcMonitor, __i
    return TRUE;
 }
 
-int getDisplayList(std::vector<DisplayConfig>& displays)
+int getDisplayList(eastl::vector<DisplayConfig>& displays)
 {
    displays.clear();
    std::map<std::string, DisplayConfig> displayMap;
@@ -479,9 +479,9 @@ int getDisplayList(std::vector<DisplayConfig>& displays)
 
 bool getDisplaySetupByID(const int display, int &x, int &y, int &width, int &height)
 {
-   std::vector<DisplayConfig> displays;
+   eastl::vector<DisplayConfig> displays;
    getDisplayList(displays);
-   for (std::vector<DisplayConfig>::iterator displayConf = displays.begin(); displayConf != displays.end(); displayConf++) {
+   for (eastl::vector<DisplayConfig>::iterator displayConf = displays.begin(); displayConf != displays.end(); displayConf++) {
       if ((display == -1 && displayConf->isPrimary) || display == displayConf->display) {
          x = displayConf->left;
          y = displayConf->top;
@@ -499,9 +499,9 @@ bool getDisplaySetupByID(const int display, int &x, int &y, int &width, int &hei
 
 int getPrimaryDisplay()
 {
-   std::vector<DisplayConfig> displays;
+   eastl::vector<DisplayConfig> displays;
    getDisplayList(displays);
-   for (std::vector<DisplayConfig>::iterator displayConf = displays.begin(); displayConf != displays.end(); displayConf++) {
+   for (eastl::vector<DisplayConfig>::iterator displayConf = displays.begin(); displayConf != displays.end(); displayConf++) {
       if (displayConf->isPrimary) {
          return displayConf->adapter;
       }

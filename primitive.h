@@ -19,12 +19,12 @@ public:
    };
    struct FrameData
    {
-      std::vector<VertData> m_frameVerts;
+      eastl::vector<VertData> m_frameVerts;
    };
 
-   std::vector<FrameData> m_animationFrames;
-   std::vector<Vertex3D_NoTex2> m_vertices;
-   std::vector<unsigned int> m_indices;
+   eastl::vector<FrameData> m_animationFrames;
+   eastl::vector<Vertex3D_NoTex2> m_vertices;
+   eastl::vector<unsigned int> m_indices;
 
    Mesh() { middlePoint.x = 0.0f; middlePoint.y = 0.0f; middlePoint.z = 0.0f; }
    void Clear();
@@ -338,7 +338,7 @@ private:        // private member functions
 
 private:        // private data members
 
-   std::vector<HitObject*> m_vhoCollidable; // Objects to that may be collide selectable
+   eastl::vector<HitObject*> m_vhoCollidable; // Objects to that may be collide selectable
 
                                             //!! outdated(?) information (along with the variable decls) for the old builtin primitive code, kept for reference:
 
@@ -382,8 +382,8 @@ private:        // private data members
                                             // = nothing...
 
                                             // Vertices for editor display
-   std::vector<Vertex3Ds> vertices;
-   std::vector<float> normals; // only z component actually
+   eastl::vector<Vertex3Ds> vertices;
+   eastl::vector<float> normals; // only z component actually
 
 
    VertexBuffer *vertexBuffer;

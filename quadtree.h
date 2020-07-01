@@ -33,7 +33,7 @@ private:
 
    Primitive* m_unique; // everything below/including this node shares the same original primitive object (just for early outs if not collidable)
 
-   std::vector<HitObject*> m_vho;
+   eastl::vector<HitObject*> m_vho;
    HitQuadtree * __restrict m_children[4];
    Vertex3Ds m_vcenter;
 

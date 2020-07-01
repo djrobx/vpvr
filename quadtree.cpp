@@ -64,7 +64,7 @@ void HitQuadtree::CreateNextLevel(const FRect3D& bounds, const unsigned int leve
    for (int i = 0; i < 4; i++)
       m_children[i] = new HitQuadtree();
 
-   std::vector<HitObject*> vRemain; // hit objects which did not go to a quadrant
+   eastl::vector<HitObject*> vRemain; // hit objects which did not go to a quadrant
 
    m_unique = m_vho[0]->m_e ? (Primitive *)(m_vho[0]->m_obj) : NULL;
 

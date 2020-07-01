@@ -359,7 +359,7 @@ void Ramp::AssignHeightToControlPoint(const RenderVertex3D &v, const float heigh
 */
 Vertex2D *Ramp::GetRampVertex(int &pcvertex, float ** const ppheight, bool ** const ppfCross, float ** const ppratio, Vertex2D ** const pMiddlePoints, const float _accuracy, const bool inc_width)
 {
-   std::vector<RenderVertex3D> vvertex;
+   eastl::vector<RenderVertex3D> vvertex;
    GetCentralCurve(vvertex, _accuracy);
    // vvertex are the 2D vertices forming the central curve of the ramp as seen from above
 
@@ -520,7 +520,7 @@ Vertex2D *Ramp::GetRampVertex(int &pcvertex, float ** const ppheight, bool ** co
 
 float Ramp::GetSurfaceHeight(float x, float y) const
 {
-   std::vector<RenderVertex3D> vvertex;
+   eastl::vector<RenderVertex3D> vvertex;
    GetCentralCurve(vvertex);
 
    int iSeg;
@@ -1474,7 +1474,7 @@ void Ramp::AddPoint(int x, int y, const bool smooth)
    STARTUNDO
       const Vertex2D v = m_ptable->TransformPoint(x, y);
 
-   std::vector<RenderVertex3D> vvertex;
+   eastl::vector<RenderVertex3D> vvertex;
    GetCentralCurve(vvertex);
 
    int iSeg;

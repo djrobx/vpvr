@@ -6,7 +6,7 @@
 #define COMBINE_BUFFERS 0
 
 IndexBuffer* IndexBuffer::m_curIndexBuffer = nullptr;
-std::vector<IndexBuffer*> IndexBuffer::notUploadedBuffers;
+eastl::vector<IndexBuffer*> IndexBuffer::notUploadedBuffers;
 
 void IndexBuffer::CreateIndexBuffer(const unsigned int numIndices, const DWORD usage, const IndexBuffer::Format format, IndexBuffer **idxBuffer)
 {
@@ -93,12 +93,12 @@ IndexBuffer* IndexBuffer::CreateAndFillIndexBuffer(const unsigned int numIndices
    return ib;
    }
 
-IndexBuffer* IndexBuffer::CreateAndFillIndexBuffer(const std::vector<WORD>& indices)
+IndexBuffer* IndexBuffer::CreateAndFillIndexBuffer(const eastl::vector<WORD>& indices)
 {
    return CreateAndFillIndexBuffer((unsigned int)indices.size(), indices.data());
 }
 
-IndexBuffer* IndexBuffer::CreateAndFillIndexBuffer(const std::vector<unsigned int>& indices)
+IndexBuffer* IndexBuffer::CreateAndFillIndexBuffer(const eastl::vector<unsigned int>& indices)
 {
    return CreateAndFillIndexBuffer((unsigned int)indices.size(), indices.data());
 }

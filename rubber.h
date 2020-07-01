@@ -135,9 +135,9 @@ private:
    int m_numVertices;      // this goes along with dynamicVertexBuffer
    int m_numIndices;
 
-   std::vector<HitObject*> m_vhoCollidable; // Objects to that may be collide selectable
-   std::vector<Vertex3D_NoTex2> m_vertices;
-   std::vector<WORD> ringIndices;
+   eastl::vector<HitObject*> m_vhoCollidable; // Objects to that may be collide selectable
+   eastl::vector<Vertex3D_NoTex2> m_vertices;
+   eastl::vector<WORD> ringIndices;
 
    Vertex3Ds middlePoint;
 
@@ -148,7 +148,7 @@ private:
    PropertyPane *m_propVisual;
    PropertyPane *m_propPhysics;
 
-   void GetCentralCurve(std::vector<RenderVertex> &vv, const float _accuracy = -1.f) const;
+   void GetCentralCurve(eastl::vector<RenderVertex> &vv, const float _accuracy = -1.f) const;
 
    Vertex2D *GetSplineVertex(int &pcvertex, bool ** const ppfCross, Vertex2D ** const pMiddlePoints, const float _accuracy = -1.f);
 

@@ -164,7 +164,7 @@ public:
 
    LightData m_d;
    LightState m_realState;
-   std::vector<RenderVertex> m_vvertex;
+   eastl::vector<RenderVertex> m_vvertex;
 
    float m_initSurfaceHeight;
    float m_surfaceHeight;

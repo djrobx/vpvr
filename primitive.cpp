@@ -12,8 +12,8 @@
 
 // defined in objloader.cpp
 extern bool WaveFrontObj_Load(const char *filename, const bool flipTv, const bool convertToLeftHanded);
-extern void WaveFrontObj_GetVertices(std::vector<Vertex3D_NoTex2>& verts);
-extern void WaveFrontObj_GetIndices(std::vector<unsigned int>& list);
+extern void WaveFrontObj_GetVertices(eastl::vector<Vertex3D_NoTex2>& verts);
+extern void WaveFrontObj_GetIndices(eastl::vector<unsigned int>& list);
 extern void WaveFrontObj_Save(const char *filename, const char *description, const Mesh& mesh);
 //
 
@@ -38,7 +38,7 @@ bool Mesh::LoadAnimation(const char *fname, const bool flipTV, const bool conver
    string name(fname);
    int frameCounter = 0;
    size_t idx = name.find_last_of("_");
-   std::vector<string> allFiles;
+   eastl::vector<string> allFiles;
    if (idx == string::npos)
    {
       ShowError("Can't find sequence of obj files! The file name of the sequence must be <meshname>_x.obj where x is the frame number!");
@@ -62,7 +62,7 @@ bool Mesh::LoadAnimation(const char *fname, const bool flipTV, const bool conver
       sname = allFiles[i];
       if (WaveFrontObj_Load(sname.c_str(), flipTV, convertToLeftHanded))
       {
-         std::vector<Vertex3D_NoTex2> verts;
+         eastl::vector<Vertex3D_NoTex2> verts;
          WaveFrontObj_GetVertices(verts);
          for (size_t t = 0; t < verts.size(); t++)
          {
@@ -471,14 +471,14 @@ void Primitive::GetHitShapes(vector<HitObject*> &pvho)
 
    if (reduced_vertices < vertices.size())
    {
-      std::vector<ProgMesh::float3> prog_vertices(vertices.size());
+      eastl::vector<ProgMesh::float3> prog_vertices(vertices.size());
       for (size_t i = 0; i < vertices.size(); ++i) //!! opt. use original data directly!
       {
          prog_vertices[i].x = vertices[i].x;
          prog_vertices[i].y = vertices[i].y;
          prog_vertices[i].z = vertices[i].z;
       }
-      std::vector<ProgMesh::tridata> prog_indices(m_mesh.NumIndices() / 3);
+      eastl::vector<ProgMesh::tridata> prog_indices(m_mesh.NumIndices() / 3);
       {
          size_t i2 = 0;
          for (size_t i = 0; i < m_mesh.NumIndices(); i += 3)
@@ -493,13 +493,13 @@ void Primitive::GetHitShapes(vector<HitObject*> &pvho)
          if (i2 < prog_indices.size())
             prog_indices.resize(i2);
       }
-      std::vector<unsigned int> prog_map;
-      std::vector<unsigned int> prog_perm;
+      eastl::vector<unsigned int> prog_map;
+      eastl::vector<unsigned int> prog_perm;
       ProgMesh::ProgressiveMesh(prog_vertices, prog_indices, prog_map, prog_perm);
       ProgMesh::PermuteVertices(prog_perm, prog_vertices, prog_indices);
       prog_perm.clear();
 
-      std::vector<ProgMesh::tridata> prog_new_indices;
+      eastl::vector<ProgMesh::tridata> prog_new_indices;
       ProgMesh::ReMapIndices(reduced_vertices, prog_indices, prog_new_indices, prog_map);
       prog_indices.clear();
       prog_map.clear();
@@ -732,7 +732,7 @@ void Primitive::UIRenderPass2(Sur * const psur)
             if (m_mesh.NumIndices() > 0)
             {
                const size_t numPts = m_mesh.NumIndices() / 3 + 1;
-               std::vector<Vertex2D> drawVertices(numPts);
+               eastl::vector<Vertex2D> drawVertices(numPts);
 
                const Vertex3Ds& A = vertices[m_mesh.m_indices[0]];
                drawVertices[0] = Vertex2D(A.x, A.y);
@@ -750,7 +750,7 @@ void Primitive::UIRenderPass2(Sur * const psur)
       }
       else
       {
-         std::vector<Vertex2D> drawVertices;
+         eastl::vector<Vertex2D> drawVertices;
          for (size_t i = 0; i < m_mesh.NumIndices(); i += 3)
          {
             const Vertex3Ds * const A = &vertices[m_mesh.m_indices[i]];
@@ -794,7 +794,7 @@ void Primitive::UIRenderPass2(Sur * const psur)
          ppi->EnsureHBitmap();
          if (ppi->m_hbmGDIVersion)
          {
-            std::vector<RenderVertex> vvertex;
+            eastl::vector<RenderVertex> vvertex;
             for (size_t i = 0; i < m_mesh.NumIndices(); i += 3)
             {
                const Vertex3Ds * const A = &vertices[m_mesh.m_indices[i]];
@@ -867,7 +867,7 @@ void Primitive::RenderBlueprint(Sur *psur, const bool solid)
          if (m_mesh.NumIndices() > 0)
          {
             const size_t numPts = m_mesh.NumIndices() / 3 + 1;
-            std::vector<Vertex2D> drawVertices(numPts);
+            eastl::vector<Vertex2D> drawVertices(numPts);
 
             const Vertex3Ds& A = vertices[m_mesh.m_indices[0]];
             drawVertices[0] = Vertex2D(A.x, A.y);
@@ -885,7 +885,7 @@ void Primitive::RenderBlueprint(Sur *psur, const bool solid)
    }
    else
    {
-      std::vector<Vertex2D> drawVertices;
+      eastl::vector<Vertex2D> drawVertices;
       for (size_t i = 0; i < m_mesh.NumIndices(); i += 3)
       {
          const Vertex3Ds * const A = &vertices[m_mesh.m_indices[i]];
@@ -1470,7 +1470,7 @@ HRESULT Primitive::SaveData(IStream *pstm, HCRYPTHASH hcrypthash, BOOL bBackupFo
       }
       else
       {
-         std::vector<WORD> tmp(m_mesh.NumIndices());
+         eastl::vector<WORD> tmp(m_mesh.NumIndices());
          for (size_t i = 0; i < m_mesh.NumIndices(); ++i)
             tmp[i] = m_mesh.m_indices[i];
 #ifndef COMPRESS_MESHES
@@ -1782,7 +1782,7 @@ BOOL Primitive::LoadToken(int id, BiffReader *pbr)
          pbr->GetStruct(m_mesh.m_indices.data(), (int)sizeof(unsigned int)*numIndices);
       else
       {
-         std::vector<WORD> tmp(numIndices);
+         eastl::vector<WORD> tmp(numIndices);
          pbr->GetStruct(tmp.data(), (int)sizeof(WORD)*numIndices);
          for (int i = 0; i < numIndices; ++i)
             m_mesh.m_indices[i] = tmp[i];
@@ -1814,7 +1814,7 @@ BOOL Primitive::LoadToken(int id, BiffReader *pbr)
       }
       else
       {
-         std::vector<WORD> tmp(numIndices);
+         eastl::vector<WORD> tmp(numIndices);
 
          //LZWReader lzwreader(pbr->m_pistream, (int *)tmp.data(), sizeof(WORD)*numIndices, 1, sizeof(WORD)*numIndices);
          //lzwreader.Decoder();

@@ -88,7 +88,7 @@ public:
    virtual IDebugCommands *GetDebugCommands() { return (IDebugCommands *) this; }
 
    // IDebugCommands
-   virtual void GetDebugCommands(std::vector<int> & pvids, std::vector<int> & pvcommandid);
+   virtual void GetDebugCommands(eastl::vector<int> & pvids, eastl::vector<int> & pvcommandid);
    virtual void RunDebugCommand(int id);
 
    Ball *m_pball;

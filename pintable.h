@@ -705,7 +705,7 @@ public:
    vector<char*> m_vCustomInfoTag;
    vector<char*> m_vCustomInfoContent;
 
-   std::vector<HANDLE> m_vAsyncHandles;
+   eastl::vector<HANDLE> m_vAsyncHandles;
 
    int  m_globalDetailLevel;
    int  m_userDetailLevel;

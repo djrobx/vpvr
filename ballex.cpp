@@ -10,7 +10,7 @@ BallEx::~BallEx()
 {
 }
 
-void BallEx::GetDebugCommands(std::vector<int> & pvids, std::vector<int> & pvcommandid)
+void BallEx::GetDebugCommands(eastl::vector<int> & pvids, eastl::vector<int> & pvcommandid)
 {
    pvids.push_back(IDS_MAKEACTIVEBALL);
    pvcommandid.push_back(0);

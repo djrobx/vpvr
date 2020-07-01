@@ -41,10 +41,11 @@
 #include <xmmintrin.h>
 
 #include <vector>
+#include <EASTL/vector.h>
 #include <string>
 #include <algorithm>
 using std::string;
-using std::vector;
+using eastl::vector;
 
 #include "HELPERS.H"
 

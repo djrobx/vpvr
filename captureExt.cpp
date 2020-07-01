@@ -205,7 +205,7 @@ bool ExtCapture::SetupCapture(RECT inputRect)
 
 	/* Enumerate the adapters.*/
 	UINT i = 0, dx = 0;
-	std::vector<IDXGIAdapter1*> adapters; /* Needs to be Released(). */
+	eastl::vector<IDXGIAdapter1*> adapters; /* Needs to be Released(). */
 
 	POINT pt;
 	pt.x = m_Rect.left;

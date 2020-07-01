@@ -121,7 +121,7 @@ private:
       float v_min, v_max;
    };
 
-   std::vector<TexCoordRect> m_digitTexCoords;
+   eastl::vector<TexCoordRect> m_digitTexCoords;
 
    // IDispReel
 public:

@@ -167,7 +167,7 @@ void Flasher::UIRenderPass1(Sur * const psur)
    // Don't want border color to be over-ridden when selected - that will be drawn later
    psur->SetBorderColor(-1, false, 0);
 
-   std::vector<RenderVertex> vvertex;
+   eastl::vector<RenderVertex> vvertex;
    GetRgVertex(vvertex);
    Texture *ppi;
    if (m_ptable->RenderSolid() && m_d.m_fDisplayTexture && (ppi = m_ptable->GetImage(m_d.m_szImageA)))
@@ -212,7 +212,7 @@ void Flasher::UIRenderPass2(Sur * const psur)
    psur->SetObject(NULL);
 
    {
-      std::vector<RenderVertex> vvertex; //!! check/reuse from UIRenderPass1
+      eastl::vector<RenderVertex> vvertex; //!! check/reuse from UIRenderPass1
       GetRgVertex(vvertex);
       psur->Polygon(vvertex);
    }
@@ -337,15 +337,15 @@ void Flasher::RenderSetup()
 {
    RenderDevice * const pd3dDevice = g_pplayer->m_pin3d.m_pd3dPrimaryDevice;
 
-   std::vector<RenderVertex> vvertex;
+   eastl::vector<RenderVertex> vvertex;
    GetRgVertex(vvertex);
 
    numVertices = (unsigned int)vvertex.size();
 
-   std::vector<WORD> vtri;
+   eastl::vector<WORD> vtri;
    
    {
-   std::vector<unsigned int> vpoly(numVertices);
+   eastl::vector<unsigned int> vpoly(numVertices);
    for (unsigned int i = 0; i < numVertices; i++)
       vpoly[i] = i;
 
@@ -503,7 +503,7 @@ void Flasher::DoCommand(int icmd, int x, int y)
       STARTUNDO
          const Vertex2D v = m_ptable->TransformPoint(x, y);
 
-      std::vector<RenderVertex> vvertex;
+      eastl::vector<RenderVertex> vvertex;
       GetRgVertex(vvertex);
 
       Vertex2D vOut;

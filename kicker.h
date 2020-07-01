@@ -93,7 +93,7 @@ public:
 
    KickerData m_d;
 
-   std::vector<Vertex3Ds> hitMesh;
+   eastl::vector<Vertex3Ds> hitMesh;
 
 private:
    PinTable * m_ptable;

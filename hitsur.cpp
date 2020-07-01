@@ -189,7 +189,7 @@ void HitSur::Polygon(const Vertex2D * const rgv, const int count)
    }
 }
 // copy-pasted from above
-void HitSur::Polygon(const std::vector<RenderVertex> &rgv)
+void HitSur::Polygon(const eastl::vector<RenderVertex> &rgv)
 {
    if (m_pcur == NULL)
       return;
@@ -240,7 +240,7 @@ void HitSur::Polygon(const std::vector<RenderVertex> &rgv)
    }
 }
 
-void HitSur::PolygonImage(const std::vector<RenderVertex> &rgv, HBITMAP hbm, const float left, const float top, const float right, const float bottom, const int bitmapwidth, const int bitmapheight)
+void HitSur::PolygonImage(const eastl::vector<RenderVertex> &rgv, HBITMAP hbm, const float left, const float top, const float right, const float bottom, const int bitmapwidth, const int bitmapheight)
 {
    Polygon(rgv);
 }

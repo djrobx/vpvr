@@ -145,7 +145,7 @@ private:
    void RenderWallsAtHeight(const bool fDrop);
    void PrepareWallsAtHeight();
    void PrepareSlingshots();
-   void GenerateMesh(std::vector<Vertex3D_NoTex2> &topBuf, std::vector<Vertex3D_NoTex2> &sideBuf, std::vector<WORD> &topBottomIndices, std::vector<WORD> &sideIndices);
+   void GenerateMesh(eastl::vector<Vertex3D_NoTex2> &topBuf, eastl::vector<Vertex3D_NoTex2> &sideBuf, eastl::vector<WORD> &topBottomIndices, eastl::vector<WORD> &sideIndices);
 
    void FreeBuffers();
 
@@ -153,10 +153,10 @@ private:
 
    BSTR m_bstrName;
 
-   std::vector<LineSegSlingshot*> m_vlinesling;
+   eastl::vector<LineSegSlingshot*> m_vlinesling;
 
-   std::vector<HitObject*> m_vhoDrop; // Objects to disable when dropped
-   std::vector<HitObject*> m_vhoCollidable; // Objects to that may be collide selectable
+   eastl::vector<HitObject*> m_vhoDrop; // Objects to disable when dropped
+   eastl::vector<HitObject*> m_vhoCollidable; // Objects to that may be collide selectable
 
    unsigned int numVertices, numPolys;
 

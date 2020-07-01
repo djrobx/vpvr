@@ -54,9 +54,9 @@ struct DisplayConfig
 };
 
 int getNumberOfDisplays();
-void EnumerateDisplayModes(const int display, std::vector<VideoMode>& modes);
+void EnumerateDisplayModes(const int display, eastl::vector<VideoMode>& modes);
 bool getDisplaySetupByID(const int display, int &x, int &y, int &width, int &height);
-int getDisplayList(std::vector<DisplayConfig>& displays);
+int getDisplayList(eastl::vector<DisplayConfig>& displays);
 int getPrimaryDisplay();
 
 enum TransformStateType {

@@ -185,7 +185,7 @@ public:
    virtual void SetDefaultPhysics(bool fromMouseClick);
    virtual void ExportMesh(FILE *f);
 
-   void GenerateMesh(std::vector<Vertex3D_NoTex2> &buf);
+   void GenerateMesh(eastl::vector<Vertex3D_NoTex2> &buf);
    void TransformVertices();
    void SetMeshType(const TargetType type);
 
@@ -215,14 +215,14 @@ private:        // private member functions
    PropertyPane *m_propPosition;
    PropertyPane *m_propPhysics;
 
-   std::vector<HitObject*> m_vhoCollidable; // Objects to that may be collide selectable
+   eastl::vector<HitObject*> m_vhoCollidable; // Objects to that may be collide selectable
 
    VertexBuffer *vertexBuffer;
    IndexBuffer *indexBuffer;
 
    // Vertices for editor display & hit shape
-   std::vector<Vertex3Ds> vertices;
-   std::vector<Vertex3D_NoTex2> transformedVertices;
+   eastl::vector<Vertex3Ds> vertices;
+   eastl::vector<Vertex3D_NoTex2> transformedVertices;
    U32   m_timeStamp;
    float m_moveAnimationOffset;
    bool  m_moveAnimation;

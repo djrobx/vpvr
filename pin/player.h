@@ -203,7 +203,7 @@ public:
    }
 
 private:
-   std::vector<VertexBuffer*> m_buffers;
+   eastl::vector<VertexBuffer*> m_buffers;
    size_t m_curIdx;
 };
 
@@ -364,13 +364,13 @@ public:
    Ball *m_pactiveballBC;	   // ball that the ball control UI will use
    Vertex3Ds *m_pBCTarget;      // If non-null, the target location for the ball to roll towards
 
-   std::vector<Ball*> m_vball;
-   std::vector<HitFlipper*> m_vFlippers;
+   eastl::vector<Ball*> m_vball;
+   eastl::vector<HitFlipper*> m_vFlippers;
 
    vector<AnimObject*> m_vanimate; // animated objects that need frame updates
 
    vector<HitTimer*> m_vht;
-   std::vector<TimerOnOff> m_changed_vht; // stores all en/disable changes to the m_vht timer list, to avoid problems with timers dis/enabling themselves
+   eastl::vector<TimerOnOff> m_changed_vht; // stores all en/disable changes to the m_vht timer list, to avoid problems with timers dis/enabling themselves
 
    Vertex3Ds m_gravity;
 
@@ -517,7 +517,7 @@ public:
    bool m_fCabinetMode;
    bool m_fMeshAsPlayfield;
    bool m_fRecordContacts;             // flag for DoHitTest()
-   std::vector< CollisionEvent > m_contacts;
+   eastl::vector< CollisionEvent > m_contacts;
 
    int m_dmdx;
    int m_dmdy;
@@ -531,9 +531,9 @@ public:
 
 private:
    vector<HitObject*> m_vho;
-   std::vector<MoverObject*> m_vmover; // moving objects for physics simulation
+   eastl::vector<MoverObject*> m_vmover; // moving objects for physics simulation
 
-   std::vector<Ball*> m_vballDelete;   // Balls to free at the end of the frame
+   eastl::vector<Ball*> m_vballDelete;   // Balls to free at the end of the frame
 
    /*HitKD*/HitQuadtree m_hitoctree;
 
@@ -552,9 +552,9 @@ private:
    U64 m_lastFlipTime;
 
    // all Hitables obtained from the table's list of Editables
-   std::vector< Hitable* > m_vhitables;
-   std::vector< Hitable* > m_vHitNonTrans; // non-transparent hitables
-   std::vector< Hitable* > m_vHitTrans;    // transparent hitables
+   eastl::vector< Hitable* > m_vhitables;
+   eastl::vector< Hitable* > m_vHitNonTrans; // non-transparent hitables
+   eastl::vector< Hitable* > m_vHitTrans;    // transparent hitables
 
    int m_curAccel_x[PININ_JOYMXCNT];
    int m_curAccel_y[PININ_JOYMXCNT];

@@ -150,9 +150,9 @@ private:
 
    Vertex3D_NoTex2* m_vertBuffer;
    Vertex3D_NoTex2* m_vertBuffer2;
-   std::vector<WORD> m_meshIndices;
+   eastl::vector<WORD> m_meshIndices;
 
-   std::vector<HitObject*> m_vhoCollidable; // Objects to that may be collide selectable
+   eastl::vector<HitObject*> m_vhoCollidable; // Objects to that may be collide selectable
 
    VertexBuffer *dynamicVertexBuffer;
    IndexBuffer *dynamicIndexBuffer;
@@ -164,7 +164,7 @@ private:
 
    // Get an approximation of the curve described by the control points of this ramp.
    template <typename T>
-   void GetCentralCurve(std::vector<T> &vv, const float _accuracy = -1.f) const
+   void GetCentralCurve(eastl::vector<T> &vv, const float _accuracy = -1.f) const
    {
       float accuracy;
 

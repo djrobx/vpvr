@@ -34,7 +34,7 @@ public:
    }
 
    inline int Size() const { return m_cSize; }
-   inline int size() const { return m_cSize; } // for compatibility with std::vector
+   inline int size() const { return m_cSize; } // for compatibility with eastl::vector
 
    inline int Capacity() const
    {

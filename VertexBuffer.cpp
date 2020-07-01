@@ -20,7 +20,7 @@ static unsigned int fvfToSize(const DWORD fvf)
 }
 
 VertexBuffer* VertexBuffer::m_curVertexBuffer = nullptr;
-std::vector<VertexBuffer*> VertexBuffer::notUploadedBuffers;
+eastl::vector<VertexBuffer*> VertexBuffer::notUploadedBuffers;
 
 
 void VertexBuffer::CreateVertexBuffer(const unsigned int vertexCount, const DWORD usage, const DWORD fvf, VertexBuffer **vBuffer)

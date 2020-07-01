@@ -175,7 +175,7 @@ bool WaveFrontObj_Load(const char *filename, const bool flipTv, const bool conve
    faces.clear();
 
    struct VertInfo { int v; int t; int n; };
-   std::vector<VertInfo> faceVerts;
+   eastl::vector<VertInfo> faceVerts;
 
    // need some small data type 
    while (1)
@@ -363,7 +363,7 @@ Error:
    return false;
 }
 
-void WaveFrontObj_GetVertices(std::vector<Vertex3D_NoTex2>& objMesh) // clears temporary storage on the way
+void WaveFrontObj_GetVertices(eastl::vector<Vertex3D_NoTex2>& objMesh) // clears temporary storage on the way
 {
    objMesh.resize(verts.size());
    for (size_t i = 0; i < verts.size(); i++)
@@ -380,7 +380,7 @@ void WaveFrontObj_GetVertices(std::vector<Vertex3D_NoTex2>& objMesh) // clears t
    verts.clear();
 }
 
-void WaveFrontObj_GetIndices(std::vector<unsigned int>& list) // clears temporary storage on the way
+void WaveFrontObj_GetIndices(eastl::vector<unsigned int>& list) // clears temporary storage on the way
 {
    list.resize(faces.size());
    for (size_t i = 0; i < faces.size(); i++)
@@ -510,7 +510,7 @@ void WaveFrontObj_WriteVertexInfo(FILE *f, const Vertex3D_NoTex2 *in_verts, unsi
    }
 }
 
-void WaveFrontObj_WriteFaceInfo(FILE *f, const std::vector<WORD> &in_faces)
+void WaveFrontObj_WriteFaceInfo(FILE *f, const eastl::vector<WORD> &in_faces)
 {
    for (size_t i = 0; i < in_faces.size(); i += 3)
    {
@@ -531,7 +531,7 @@ void WaveFrontObj_WriteFaceInfoList(FILE *f, const WORD *in_faces, const unsigne
    }
 }
 
-void WaveFrontObj_WriteFaceInfoLong(FILE *f, const std::vector<unsigned int> &in_faces)
+void WaveFrontObj_WriteFaceInfoLong(FILE *f, const eastl::vector<unsigned int> &in_faces)
 {
    for (size_t i = 0; i < in_faces.size(); i += 3)
    {
@@ -595,7 +595,7 @@ void WaveFrontObj_Save(const char *filename, const char *description, const Mesh
       char number[32] = { 0 };
       for (unsigned int i = 0; i < mesh.m_animationFrames.size(); i++)
       {
-         std::vector<Vertex3D_NoTex2> vertsTmp = mesh.m_vertices;
+         eastl::vector<Vertex3D_NoTex2> vertsTmp = mesh.m_vertices;
 
          for (unsigned int t = 0; t < mesh.NumVertices(); t++)
          {

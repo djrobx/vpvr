@@ -1666,7 +1666,7 @@ HRESULT Player::Init(PinTable * const ptable, const HWND hwndProgress, const HWN
 
 #ifdef DEBUG_BALL_SPIN
    {
-      std::vector< Vertex3D_TexelOnly > ballDbgVtx;
+      eastl::vector< Vertex3D_TexelOnly > ballDbgVtx;
       for (int j = -1; j <= 1; ++j)
       {
          const int numPts = (j == 0) ? 6 : 3;
@@ -4731,7 +4731,7 @@ inline float map_bulblight_to_emission(const Light* const l) // magic mapping of
    return l->m_d.m_currentIntensity * clamp(powf(l->m_d.m_falloff*0.6f, l->m_d.m_falloff_power*0.6f), 0.f, 23000.f); //!! 0.6f,0.6f = magic, also clamp 23000
 }
 
-void search_for_nearest(const Ball * const pball, const std::vector<Light*> &lights, Light* light_nearest[MAX_BALL_LIGHT_SOURCES])
+void search_for_nearest(const Ball * const pball, const eastl::vector<Light*> &lights, Light* light_nearest[MAX_BALL_LIGHT_SOURCES])
 {
    for (unsigned int l = 0; l < MAX_BALL_LIGHT_SOURCES; ++l)
    {
@@ -4811,7 +4811,7 @@ void Player::DrawBalls()
       m_pin3d.m_pd3dPrimaryDevice->SetRenderState(RenderDevice::ZENABLE, FALSE);
 
    // collect all lights that can reflect on balls (currently only bulbs and if flag set to do so)
-   std::vector<Light*> lights;
+   eastl::vector<Light*> lights;
    for (size_t i = 0; i < m_ptable->m_vedit.size(); i++)
    {
       IEditable * const item = m_ptable->m_vedit[i];
@@ -5144,7 +5144,7 @@ void Player::DrawBalls()
 struct DebugMenuItem
 {
    int objectindex;
-   std::vector<int> *pvdispid;
+   eastl::vector<int> *pvdispid;
    HMENU hmenu;
 };
 
@@ -5217,8 +5217,8 @@ void Player::DoDebugObjectMenu(int x, int y)
    const HMENU hmenu = CreatePopupMenu();
 
    vector<IFireEvents*> vpfe;
-   std::vector<HMENU> vsubmenu;
-   std::vector< std::vector<int>* > vvdispid;
+   eastl::vector<HMENU> vsubmenu;
+   eastl::vector< eastl::vector<int>* > vvdispid;
    for (size_t i = 0; i < vhoHit.size(); i++)
    {
       HitObject * const pho = vhoHit[i];
@@ -5247,7 +5247,7 @@ void Player::DoDebugObjectMenu(int x, int y)
             wzT = V_BSTR(&var);
             AppendMenuW(hmenu, MF_STRING | MF_POPUP, (UINT_PTR)submenu, wzT);
 
-            std::vector<int> *pvdispid = new std::vector<int>();
+            eastl::vector<int> *pvdispid = new eastl::vector<int>();
             vvdispid.push_back(pvdispid);
 
             DebugMenuItem dmi;
@@ -5260,8 +5260,8 @@ void Player::DoDebugObjectMenu(int x, int y)
          IDebugCommands * const pdc = pho->m_pfedebug->GetDebugCommands();
          if (pdc)
          {
-            std::vector<int> vids;
-            std::vector<int> vcommandid;
+            eastl::vector<int> vids;
+            eastl::vector<int> vcommandid;
 
             pdc->GetDebugCommands(vids, vcommandid);
             for (size_t l = 0; l < vids.size(); l++)

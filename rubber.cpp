@@ -141,7 +141,7 @@ void Rubber::GetPointDialogPanes(vector<PropertyPane*> &pvproppane)
 
 void Rubber::DrawRubberMesh(Sur * const psur)
 {
-   std::vector<Vertex2D> drawVertices;
+   eastl::vector<Vertex2D> drawVertices;
 
    GenerateMesh(6);
    UpdateRubber(false, m_d.m_height);
@@ -342,7 +342,7 @@ void Rubber::GetBoundingVertices(eastl::vector<Vertex3Ds>& pvvertex3D)
 */
 Vertex2D *Rubber::GetSplineVertex(int &pcvertex, bool ** const ppfCross, Vertex2D ** const pMiddlePoints, const float _accuracy)
 {
-   std::vector<RenderVertex> vvertex;
+   eastl::vector<RenderVertex> vvertex;
    GetCentralCurve(vvertex, _accuracy);
    // vvertex are the 2D vertices forming the central curve of the rubber as seen from above
 
@@ -459,7 +459,7 @@ Vertex2D *Rubber::GetSplineVertex(int &pcvertex, bool ** const ppfCross, Vertex2
 /*
 * Get an approximation of the curve described by the control points of this ramp.
 */
-void Rubber::GetCentralCurve(std::vector<RenderVertex> &vv, const float _accuracy) const
+void Rubber::GetCentralCurve(eastl::vector<RenderVertex> &vv, const float _accuracy) const
 {
    float accuracy;
 
@@ -481,7 +481,7 @@ void Rubber::GetCentralCurve(std::vector<RenderVertex> &vv, const float _accurac
 
 float Rubber::GetSurfaceHeight(float x, float y) const
 {
-   std::vector<RenderVertex> vvertex;
+   eastl::vector<RenderVertex> vvertex;
    GetCentralCurve(vvertex);
 
    const int cvertex = (int)vvertex.size();
@@ -621,7 +621,7 @@ void Rubber::GetHitShapesDebug(vector<HitObject*> &pvho)
 
 void Rubber::AddPoint(int x, int y, const bool smooth)
 {
-   std::vector<RenderVertex> vvertex;
+   eastl::vector<RenderVertex> vvertex;
    GetCentralCurve(vvertex);
    const Vertex2D v = m_ptable->TransformPoint(x, y);
    Vertex2D vOut;

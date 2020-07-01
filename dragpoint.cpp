@@ -263,10 +263,10 @@ void IHaveDragPoints::GetPointDialogPanes(vector<PropertyPane*> &pvproppane)
    pvproppane.push_back(m_propPosition);
 }
 
-void IHaveDragPoints::GetTextureCoords(const std::vector<RenderVertex> & vv, float **ppcoords)
+void IHaveDragPoints::GetTextureCoords(const eastl::vector<RenderVertex> & vv, float **ppcoords)
 {
-   std::vector<int> vitexpoints;
-   std::vector<int> virenderpoints;
+   eastl::vector<int> vitexpoints;
+   eastl::vector<int> virenderpoints;
    bool m_fNoCoords = false;
 
    const int cpoints = (int)vv.size();

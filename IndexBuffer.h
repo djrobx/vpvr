@@ -23,8 +23,8 @@ public:
 
    static IndexBuffer* CreateAndFillIndexBuffer(const unsigned int numIndices, const unsigned int * indices);
    static IndexBuffer* CreateAndFillIndexBuffer(const unsigned int numIndices, const WORD * indices);
-   static IndexBuffer* CreateAndFillIndexBuffer(const std::vector<unsigned int>& indices);
-   static IndexBuffer* CreateAndFillIndexBuffer(const std::vector<WORD>& indices);
+   static IndexBuffer* CreateAndFillIndexBuffer(const eastl::vector<unsigned int>& indices);
+   static IndexBuffer* CreateAndFillIndexBuffer(const eastl::vector<WORD>& indices);
 
    GLuint getOffset() const { return offset; }
    Format getIndexFormat() const { return indexFormat; }
@@ -47,7 +47,7 @@ private:
    Format indexFormat;
 
    static IndexBuffer* m_curIndexBuffer; // for caching
-   static std::vector<IndexBuffer*> notUploadedBuffers;
+   static eastl::vector<IndexBuffer*> notUploadedBuffers;
    void UploadData(bool freeData);
    void addToNotUploadedBuffers(const void* indices = nullptr);
 };
@@ -77,8 +77,8 @@ public:
 
    static IndexBuffer* CreateAndFillIndexBuffer(const unsigned int numIndices, const unsigned int * indices);
    static IndexBuffer* CreateAndFillIndexBuffer(const unsigned int numIndices, const WORD * indices);
-   static IndexBuffer* CreateAndFillIndexBuffer(const std::vector<unsigned int>& indices);
-   static IndexBuffer* CreateAndFillIndexBuffer(const std::vector<WORD>& indices);
+   static IndexBuffer* CreateAndFillIndexBuffer(const eastl::vector<unsigned int>& indices);
+   static IndexBuffer* CreateAndFillIndexBuffer(const eastl::vector<WORD>& indices);
 
    static void setD3DDevice(IDirect3DDevice9* pD3DDevice);
 
