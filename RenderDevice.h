@@ -308,7 +308,7 @@ RenderDevice(HWND* const hwnd, const int width, const int height, const bool ful
    D3DTexture* CreateSystemTexture(BaseTexture* const surf, const bool linearRGB);
    D3DTexture* CreateSystemTexture(const int texwidth, const int texheight, const D3DFORMAT texformat, const void* data, const int pitch, const bool linearRGB);
 #endif
-   D3DTexture* UploadTexture(BaseTexture* const surf, int* const pTexWidth = NULL, int* const pTexHeight = NULL, const bool linearRGB = true);
+   D3DTexture* UploadTexture(BaseTexture* const surf, int* const pTexWidth = NULL, int* const pTexHeight = NULL, const bool linearRGB = true, const bool clamptoedge = false);
    void UpdateTexture(D3DTexture* const tex, BaseTexture* const surf, const bool linearRGB);
 
    void SetRenderState(const RenderStates p1, DWORD p2);
@@ -326,7 +326,7 @@ RenderDevice(HWND* const hwnd, const int width, const int height, const bool ful
    void SetSamplerState(const DWORD Sampler, const DWORD minFilter, const DWORD magFilter, const SamplerStateValues mipFilter);
    void SetSamplerAnisotropy(const DWORD Sampler, DWORD Value);
 
-   D3DTexture* CreateTexture(UINT Width, UINT Height, UINT Levels, textureUsage Usage, colorFormat Format, void* data, int stereo);
+   D3DTexture* CreateTexture(UINT Width, UINT Height, UINT Levels, textureUsage Usage, colorFormat Format, void* data, int stereo, bool clamptoedge = false);
 //   HRESULT CreateTexture(UINT Width, UINT Height, UINT Levels, textureUsage Usage, colorFormat Format, memoryPool Pool, D3DTexture** ppTexture, HANDLE* pSharedHandle);
 
 #ifdef ENABLE_SDL

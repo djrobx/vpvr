@@ -66,7 +66,7 @@ public:
    void Begin(const unsigned int pass);
    void End();
 
-   void SetTexture(const D3DXHANDLE texelName, Texture *texel, const bool linearRGB);
+   void SetTexture(const D3DXHANDLE texelName, Texture *texel, const bool linearRGB, const bool clamptoedge = false);
    void SetTexture(const D3DXHANDLE texelName, D3DTexture *texel, const bool linearRGB);
    void SetTextureDepth(const D3DXHANDLE texelName, D3DTexture *texel);
    void SetTextureNull(const D3DXHANDLE texelName);

@@ -981,13 +981,13 @@ void Shader::SetTextureDepth(const D3DXHANDLE texelName, D3DTexture *texel) {
    }
 }
 
-void Shader::SetTexture(const D3DXHANDLE texelName, Texture *texel, const bool linearRGB)
+void Shader::SetTexture(const D3DXHANDLE texelName, Texture *texel, const bool linearRGB, const bool clamptoedge)
 {
    if (!texel || !texel->m_pdsBuffer) {
       SetTextureNull(texelName);
    }
    else {
-      SetTexture(texelName, m_renderDevice->m_texMan.LoadTexture(texel->m_pdsBuffer, linearRGB), linearRGB);
+      SetTexture(texelName, m_renderDevice->m_texMan.LoadTexture(texel->m_pdsBuffer, linearRGB, clamptoedge), linearRGB);
       SetBool("SRGBTexture", linearRGB);
    }
 }

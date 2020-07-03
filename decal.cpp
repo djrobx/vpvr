@@ -539,7 +539,7 @@ void Decal::RenderObject()
    if (m_d.m_decaltype != DecalImage)
    {
       pd3dDevice->basicShader->SetTechnique("basic_with_texture");
-      pd3dDevice->basicShader->SetTexture("Texture0", pd3dDevice->m_texMan.LoadTexture(m_textImg, false), false);
+      pd3dDevice->basicShader->SetTexture("Texture0", pd3dDevice->m_texMan.LoadTexture(m_textImg, false, false), false);
       pd3dDevice->basicShader->SetAlphaTestValue(-1.0f);
    }
    else

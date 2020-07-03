@@ -158,7 +158,7 @@ BackGlass::BackGlass(RenderDevice* const pd3dDevice,Texture * backgroundFallback
                   }
                   int size = decode_base64(attrib->value(), (char*)data, attrib->value_size(), data_len);
                   if ((size > 0) && (strcmp(imagesNode->name(), "BackglassImage") == 0)) {
-                     m_backgroundTexture = m_pd3dDevice->m_texMan.LoadTexture(BaseTexture::CreateFromData(data, size), true);
+                     m_backgroundTexture = m_pd3dDevice->m_texMan.LoadTexture(BaseTexture::CreateFromData(data, size), true, true);
                      backglass_width = m_backgroundTexture->width;
                      backglass_height = m_backgroundTexture->height;
                   }
@@ -210,7 +210,7 @@ void BackGlass::Render()
 
    if (g_pplayer->m_capPUP && capturePUP())
    {
-      m_backgroundTexture = m_pd3dDevice->m_texMan.LoadTexture(g_pplayer->m_texPUP, true);
+      m_backgroundTexture = m_pd3dDevice->m_texMan.LoadTexture(g_pplayer->m_texPUP, true, true);
       backglass_width = m_backgroundTexture->width;
       backglass_height = m_backgroundTexture->height;
       float tableWidth, glassHeight;
@@ -242,7 +242,7 @@ void BackGlass::Render()
    if (m_backgroundTexture)
       m_pd3dDevice->DMDShader->SetTexture("Texture0", m_backgroundTexture, false);
    else if (m_backgroundFallback)
-      m_pd3dDevice->DMDShader->SetTexture("Texture0", m_backgroundFallback, false);
+      m_pd3dDevice->DMDShader->SetTexture("Texture0", m_backgroundFallback, false, true);
    else return;
 
    m_pd3dDevice->SetRenderState(RenderDevice::ZWRITEENABLE, RenderDevice::RS_FALSE);
@@ -290,7 +290,7 @@ void BackGlass::DMDdraw(const float DMDposx, const float DMDposy, const float DM
          m_pd3dDevice->DMDShader->SetTechnique("basic_DMD_ext");
 
       if (g_pplayer->m_texdmd != NULL)
-         m_pd3dDevice->DMDShader->SetTexture("Texture0", m_pd3dDevice->m_texMan.LoadTexture(g_pplayer->m_texdmd, false), false);
+         m_pd3dDevice->DMDShader->SetTexture("Texture0", m_pd3dDevice->m_texMan.LoadTexture(g_pplayer->m_texdmd, false, true), false);
       //      m_pd3dPrimaryDevice->DMDShader->SetVector("quadOffsetScale", 0.0f, -1.0f, backglass_scale, backglass_scale*(float)backglass_height / (float)backglass_width);
       bool zDisabled = false;
       const float scale = 0.5f;// 0.5 => use 50% of the height of the grill.

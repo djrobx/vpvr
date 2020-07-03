@@ -1309,7 +1309,7 @@ void Flasher::RenderDynamic()
           pd3dDevice->DMDShader->SetTechnique("basic_DMD_world_ext");
 
        if (g_pplayer->m_texdmd != NULL)
-          pd3dDevice->DMDShader->SetTexture("Texture0", g_pplayer->m_pin3d.m_pd3dPrimaryDevice->m_texMan.LoadTexture(g_pplayer->m_texdmd, false), false);
+          pd3dDevice->DMDShader->SetTexture("Texture0", g_pplayer->m_pin3d.m_pd3dPrimaryDevice->m_texMan.LoadTexture(g_pplayer->m_texdmd, false, true), false);
 
        pd3dDevice->DMDShader->Begin(0);
        pd3dDevice->DrawIndexedPrimitiveVB(RenderDevice::TRIANGLELIST, MY_D3DFVF_TEX, dynamicVertexBuffer, 0, numVertices, dynamicIndexBuffer, 0, numPolys * 3);
@@ -1352,7 +1352,7 @@ void Flasher::RenderDynamic()
        if (pinA && !pinB)
        {
           flasherMode = 0.f;
-          pd3dDevice->flasherShader->SetTexture("Texture0", pinA, false);
+          pd3dDevice->flasherShader->SetTexture("Texture0", pinA, false, true);
 
           if (!m_d.m_fAddBlend)
              flasherData.x = pinA->m_alphaTestValue * (float)(1.0 / 255.0);
@@ -1362,7 +1362,7 @@ void Flasher::RenderDynamic()
        else if (!pinA && pinB)
        {
           flasherMode = 0.f;
-          pd3dDevice->flasherShader->SetTexture("Texture0", pinB, false);
+          pd3dDevice->flasherShader->SetTexture("Texture0", pinB, false, true);
 
           if (!m_d.m_fAddBlend)
              flasherData.x = pinB->m_alphaTestValue * (float)(1.0 / 255.0);
@@ -1372,8 +1372,8 @@ void Flasher::RenderDynamic()
        else if (pinA && pinB)
        {
           flasherMode = 1.f;
-          pd3dDevice->flasherShader->SetTexture("Texture0", pinA, false);
-          pd3dDevice->flasherShader->SetTexture("Texture1", pinB, false);
+          pd3dDevice->flasherShader->SetTexture("Texture0", pinA, false, true);
+          pd3dDevice->flasherShader->SetTexture("Texture1", pinB, false, true);
 
           if (!m_d.m_fAddBlend)
           {

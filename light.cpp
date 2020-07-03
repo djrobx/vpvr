@@ -594,7 +594,7 @@ void Light::RenderDynamic()
       {
          pd3dDevice->classicLightShader->SetBool("hdrTexture0", offTexel->IsHDR());
          pd3dDevice->classicLightShader->SetTechnique("light_with_texture");
-         pd3dDevice->classicLightShader->SetTexture("Texture0", offTexel, false);
+         pd3dDevice->classicLightShader->SetTexture("Texture0", offTexel, false, true);
          if (m_ptable->m_fReflectElementsOnPlayfield && g_pplayer->m_pf_refl && !m_fBackglass)
          {
             pd3dDevice->SetRenderState(RenderDevice::ALPHABLENDENABLE, RenderDevice::RS_TRUE);
