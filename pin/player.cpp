@@ -4599,8 +4599,9 @@ void Player::Render()
 
    if (m_ptable->m_pcv->m_fScriptError)
    {
-      // Crash back to the editor
-      SendMessage(m_playfieldHwnd, WM_CLOSE, 0, 0);
+       // Crash back to the editor
+
+       ShutDownPlayer();
    }
    else
    {
