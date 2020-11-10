@@ -10,6 +10,7 @@
 // 5. Fill texture data periodically.
 
 ExtCapture ecDMD, ecPUP;
+//std::map<void*, ExtCapture> ecDyn;
 bool StopCapture;
 std::thread threadCap;
 
@@ -85,7 +86,7 @@ void captureThread()
 
 void captureStartup()
 {
-	std::list<string> dmdlist = { "Virtual DMD", "pygame", "PUPSCREEN1", "formDMD" };
+	std::list<string> dmdlist = { "Virtual DMD", "pygame", "PUPSCREEN1", "formDMD", "PUPSCREEN5" };
 	ecDMD.Setup(dmdlist);
 	std::list<string> puplist = { "PUPSCREEN2", "Form1" };
 	ecPUP.Setup(puplist);
