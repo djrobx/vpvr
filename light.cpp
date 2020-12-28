@@ -595,7 +595,7 @@ void Light::RenderDynamic()
          pd3dDevice->classicLightShader->SetBool("hdrTexture0", offTexel->IsHDR());
          pd3dDevice->classicLightShader->SetTechnique("light_with_texture");
          pd3dDevice->classicLightShader->SetTexture("Texture0", offTexel, false, true);
-         if (m_ptable->m_fReflectElementsOnPlayfield && g_pplayer->m_pf_refl && !m_fBackglass)
+         if (!m_fBackglass)
          {
             pd3dDevice->SetRenderState(RenderDevice::ALPHABLENDENABLE, RenderDevice::RS_TRUE);
             pd3dDevice->SetRenderState(RenderDevice::SRCBLEND, RenderDevice::ONE);
@@ -660,7 +660,7 @@ void Light::RenderDynamic()
    else
       pd3dDevice->lightShader->End();
 
-   if (!m_d.m_BulbLight && offTexel != NULL && m_ptable->m_fReflectElementsOnPlayfield && g_pplayer->m_pf_refl && !m_fBackglass)
+   if (!m_d.m_BulbLight && offTexel != NULL && !m_fBackglass)
    {
       pd3dDevice->SetRenderState(RenderDevice::ALPHABLENDENABLE, RenderDevice::RS_FALSE);
       pd3dDevice->SetRenderState(RenderDevice::SRCBLEND, RenderDevice::SRC_ALPHA);
